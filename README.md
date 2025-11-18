@@ -6,7 +6,7 @@
 
 ## Contributing
 
-To contribute to Gitlab, first create a [Personal access token](//-/profile/personal_access_tokens).
+To contribute to Gitlab, first create a [Personal access token](https://gitlab.bsc.es/-/profile/personal_access_tokens).
 Then either `git clone`
 
 ```sh
@@ -26,4 +26,3 @@ For bigger features, always make changes via a merge-request.
 This [project] has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No. 101196394.
 
 [project]: https://www.evitahpc.eu/
-
