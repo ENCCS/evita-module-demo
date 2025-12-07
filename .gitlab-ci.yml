@@ -89,6 +89,7 @@ build-docs:
 # Note: This job MUST be named "pages" for GitLab Pages to work
 pages:
   stage: deploy
+  pages: true  # specifies that this is a Pages job and publishes the default public directory
   tags:
     - runner
   dependencies:
