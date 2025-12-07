@@ -132,3 +132,14 @@ intersphinx_mapping = {
     "myst": ("https://myst-parser.readthedocs.io/en/latest/", None),
 }
 intersphinx_timeout = 3
+
+# Settings for sphinx_pyppeteer_builder (PDF generation)
+# Required for running Chromium in Docker containers
+pyppeteer_pdf_options = {
+    "headless": True,
+    "args": [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+    ]
+}
