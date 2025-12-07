@@ -1,4 +1,6 @@
 /_build
+/public
+.gitlab-pages-tmp
 .ipynb_checkpoints
 /venv*
 .jupyter_cache
