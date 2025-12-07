@@ -131,3 +131,4 @@ intersphinx_mapping = {
     "lesson": ("https://coderefinery.github.io/sphinx-lesson/", None),
     "myst": ("https://myst-parser.readthedocs.io/en/latest/", None),
 }
+intersphinx_timeout = 3
