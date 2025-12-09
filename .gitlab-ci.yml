@@ -65,7 +65,7 @@ build-docs:
         echo "Generating PDF..."
         # Install Chromium dependencies for pyppeteer
         apt-get update
-        apt-get install -y chromium libxss1 libasound2 libatk-bridge2.0-0 libgtk-3-0
+        apt-get install -y chromium # libxss1 libasound2 libatk-bridge2.0-0 libgtk-3-0
         pip install sphinx_pyppeteer_builder
         # Configure pyppeteer to run in Docker (no sandbox)
         export PYPPETEER_CHROMIUM_ARGS="--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage"
