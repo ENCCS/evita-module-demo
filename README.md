@@ -1,8 +1,11 @@
-# EVITA module template
+# EVITA module demo
 
 > [!NOTE]
 > Authors who will adopt this template for developing modules are recommended to
-> [begin here](https://enccs.github.io/evita-module-demo/reference/structure-evita-module/).
+> [begin here](https://enccs.github.io/evita-module-demo/reference/structure-evita-module/) to understand the
+> structure of an EVITA module. Then clone / fork the
+> [official template repository](https://code.europa.eu/eurohpc-ju/evita/module-template)
+> to author your module.
 
 > [!warning]
 > Early access preview. See [disclaimer below](#disclaimer).
