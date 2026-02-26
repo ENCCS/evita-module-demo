@@ -34,7 +34,7 @@ copyright = f"2026, EVITA project, {author}"
 # FIXME: git organization / user that the repository belongs to
 git_forge = "code.europa.eu"  # or "github.com"
 git_user = "eurohpc-ju/evita"
-git_repo_name = ""  # auto-detected from dirname if blank
+git_repo_name = "module-demo"  # auto-detected from dirname if blank
 git_version = "main"
 conf_py_path = "content"
 
@@ -168,5 +168,5 @@ pyppeteer_pdf_options = {
         "--no-sandbox",
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
-    ]
+    ],
 }
