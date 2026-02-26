@@ -29,13 +29,14 @@ Tobias Haas, \
 Victoria Döller, \
 Yinyin Ma, and \
 Yonglei Wang"
-copyright = f"2025, EVITA project, {author}"
+copyright = f"2026, EVITA project, {author}"
 
-# FIXME: github organization / user that the repository belongs to
-github_user = "ENCCS"
-github_repo_name = ""  # auto-detected from dirname if blank
-github_version = "main"
-conf_py_path = "/content/"  # with leading and trailing slash
+# FIXME: git organization / user that the repository belongs to
+git_forge = "code.europa.eu"  # or "github.com"
+git_user = "eurohpc-ju/evita"
+git_repo_name = ""  # auto-detected from dirname if blank
+git_version = "main"
+conf_py_path = "content"
 
 # -- General configuration ---------------------------------------------------
 
@@ -43,8 +44,6 @@ conf_py_path = "/content/"  # with leading and trailing slash
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    # githubpages just adds a .nojekyll file
-    "sphinx.ext.githubpages",
     "sphinx_lesson",
     "sphinx_evita",
     "sphinxcontrib.bibtex",
@@ -52,6 +51,10 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.intersphinx",
 ]
+
+if git_forge == "github.com":
+    # githubpages just adds a .nojekyll file
+    extensions.append("sphinx.ext.githubpages")
 
 # FIXME: add bibtex files for references if any
 bibtex_bibfiles = []
@@ -86,6 +89,15 @@ exclude_patterns = [
 ]
 
 # -- Options for HTML output -------------------------------------------------
+from pathlib import Path
+from sphinx_evita import icons
+
+
+# Auto-detect directory name. This can break, but useful as a default.
+HERE = Path(__file__).parent
+detected_repo_name = HERE.parent.name
+
+git_repo_url = f"https://{git_forge}/{git_user}/{git_repo_name or detected_repo_name}"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -96,18 +108,33 @@ html_title = project
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-# html_css_files = ["overrides.css"]
+html_css_files = ["overrides.css"]
+html_favicon = str((HERE / "_static" / "favicon.ico").resolve())
+
+# Some theme options such as logo are defined by sphinx-evita extensions
+html_theme_options = {
+    # Gitlab
+    "source_edit_link": f"{git_repo_url}/-/edit/{git_version}/{conf_py_path}/{{filename}}",
+    "source_view_link": f"{git_repo_url}/-/blob/{git_version}/{conf_py_path}/{{filename}}?plain=1",
+    # Github
+    # "source_repository": git_repo_url,
+    # "source_branch": git_version,
+    # "source_directory": conf_py_path,
+    "footer_icons": [
+        {
+            "name": git_forge,
+            "url": git_repo_url,
+            "html": icons.gitlab,
+            "class": "",
+        },
+    ],
+}
 
 # HTML context:
-from os.path import basename, dirname, realpath
-
 html_context = {
-    "display_github": True,
-    "github_user": github_user,
-    # Auto-detect directory name.  This can break, but
-    # useful as a default.
-    "github_repo": github_repo_name or basename(dirname(dirname(realpath(__file__)))),
-    "github_version": github_version,
+    "git_user": git_user,
+    "git_repo": git_repo_name or detected_repo_name,
+    "git_version": git_version,
     "conf_py_path": conf_py_path,
 }
 
