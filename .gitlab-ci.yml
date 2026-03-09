@@ -31,7 +31,7 @@ cache:
 build-docs:
   stage: build
   tags:
-    - shared-docker
+    - liutest
   script:
     # Install dependencies
     - python -m pip install --upgrade pip
@@ -91,7 +91,7 @@ pages:
   stage: deploy
   pages: true  # specifies that this is a Pages job and publishes the default public directory
   tags:
-    - shared-docker
+    - liutest
   dependencies:
     - build-docs
   script:
