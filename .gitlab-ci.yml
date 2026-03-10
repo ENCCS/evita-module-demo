@@ -14,7 +14,7 @@ stages:
 
 variables:
   DEFAULT_BRANCH: "main"
-  GENERATE_PDF: "true"
+  GENERATE_PDF: "false"
   GENERATE_SINGLEHTML: "true"
   PDF_FILENAME: "lesson.pdf"
   MULTIBRANCH: "true"
