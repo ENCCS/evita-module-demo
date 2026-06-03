@@ -64,7 +64,7 @@ nb_execution_mode = "cache"
 
 # https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
 myst_enable_extensions = ["colon_fence", "attrs_inline", "substitution"]
-myst_substitutions = {"author": author}
+myst_substitutions = {"author": author, "copyright": copyright}
 
 # Settings for sphinx-copybutton
 copybutton_exclude = ".linenos, .gp"
@@ -99,6 +99,8 @@ git_repo_url = f"https://{git_forge}/{git_user}/{git_repo_name or detected_repo_
 # a list of builtin themes.
 #
 html_title = project
+# NOTE: the html_theme is automatically configured by sphinx-evita
+# html_theme = "furo"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
