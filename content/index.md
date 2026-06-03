@@ -72,7 +72,7 @@ Don't forget to check out additional [**course materials**](https://www.evitahpc
 :::{admonition} CC BY-SA for media and pedagogical material
 :class: attention dropdown
 
-Copyright © 2025 XXX. This material is released by XXX under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
+Copyright © 2026, EVITA project, {{ author }}. This material is released by EVITA project, {{ author }} under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
 
 **Canonical URL**: <https://creativecommons.org/licenses/by-sa/4.0/>
 
@@ -92,9 +92,9 @@ Copyright © 2025 XXX. This material is released by XXX under the Creative Commo
 
 ## Notices
 
-You do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable [exception or limitation](https://creativecommons.org/licenses/by/4.0/deed.en#ref-exception-or-limitation) .
+You do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable [exception or limitation](https://creativecommons.org/licenses/by-sa/4.0/deed.en#ref-exception-or-limitation) .
 
-No warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as [publicity, privacy, or moral rights](https://creativecommons.org/licenses/by/4.0/deed.en#ref-publicity-privacy-or-moral-rights) may limit how you use the material.
+No warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as [publicity, privacy, or moral rights](https://creativecommons.org/licenses/by-sa/4.0/deed.en#ref-publicity-privacy-or-moral-rights) may limit how you use the material.
 
 This deed highlights only some of the key features and terms of the actual license. It is not a license and has no legal value. You should carefully review all of the terms and conditions of the actual license before using the licensed material.
 
@@ -105,7 +105,7 @@ This deed highlights only some of the key features and terms of the actual licen
 
 MIT License
 
-Copyright (c) 2025, EVITA project, {{ author }}
+Copyright (c) 2026, EVITA project, {{ author }}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
