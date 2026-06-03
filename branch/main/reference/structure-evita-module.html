@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Structure of an EVITA module &#8212; High Performance Data Analytics in Python</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_lesson.css?v=e9df6548" />
+    <link rel="stylesheet" type="text/css" href="../_static/term_role_formatting.css?v=4194e21c" />
+    <link rel="stylesheet" type="text/css" href="../_static/furo_ext_lesson.css?v=6c0cde2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/overrides.css" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=35a8b989"></script>
+    <script src="../_static/minipres.js?v=a0d29692"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Reference for learners" href="../reference-for-learners.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="structure-of-an-evita-module">
+<h1>Structure of an EVITA module<a class="headerlink" href="#structure-of-an-evita-module" title="Link to this heading">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<ul class="simple">
+<li><p>For a <em>technical overview</em> for authoring such modules, a
+<a class="reference external" href="https://sphinx-evita.readthedocs.io/en/latest/ref-for-module-authors.html" title="sphinx-evita">reference for module authors</a> is maintained along with
+the documentation for the <code class="docutils literal notranslate"><span class="pre">sphinx-evita</span></code> extension<a class="footnote-reference brackets" href="#ref-auth" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p></li>
+<li><p>For <em>best practices</em> in creating great lessons, get inspired by reading a <a class="reference external" href="https://enccs.github.io/instructor-training/lesson-design/" title="ENCCS Instructor Training">primer on lesson design</a><a class="footnote-reference brackets" href="#ref-lesson-design" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p></li>
+</ul>
+</div>
+<p>An EVITA module is a combination of pedagogical material and
+working examples of code. These are presented to a learner in
+smaller logical units called <em>episodes</em>. The module extensively uses</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.sphinx-doc.org/en/master/index.html" title="Sphinx 9.1.0">Sphinx</a> as the documentation engine,</p></li>
+<li><p><a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/index.html" title="MyST Parser 5.1.0">MyST Parser</a> to parse the content in Markdown and Jupyter notebooks,</p></li>
+<li><p><a class="reference external" href="https://coderefinery.github.io/sphinx-lesson/" title="Sphinx-lesson 0.8.19">sphinx-lesson</a> to provide an extended set of markup known as <em>directives</em>, and</p></li>
+<li><p><a class="reference external" href="https://sphinx-evita.readthedocs.io/en/latest/index.html" title="sphinx-evita">sphinx-evita</a> to customize the appearance.</p></li>
+</ul>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Module developers are expected to provide the following:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">conf.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">index.md</span></code></p></li>
+<li><p>An episodes directory containing</p>
+<ul>
+<li><p>Jupyter notebooks preferably (Markdown and reStructuredText files are also acceptable; alternatively slides in ODP/PPTX and PDF pairs)</p></li>
+<li><p>Images used in the notebooks</p></li>
+<li><p>Longer code examples referenced in the notebooks as stand-alone file (Short code snippets can be described inline).</p></li>
+<li><p>Demos and type-along sessions to introduce the topic</p></li>
+<li><p>Discussions and exercises designed for <em>formative assessment</em>.</p></li>
+</ul>
+</li>
+<li><p>Questions and quizzes for <em>summative assessment</em>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instructor-guide.md</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reference-for-learners.md</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code> file</p></li>
+</ul>
+<p>To sum up a new module is organized as shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── CITATION.cff
+├── content
+│   ├── conf.py
+│   ├── episodes
+│   │   ├── code
+│   │   │   └── code-example.py
+│   │   ├── images
+│   │   │   └── inline-image-example.png
+│   │   ├── ModuleName-1-EpisodeName.md
+│   │   ├── ModuleName-2-EpisodeName.ipynb
+│   │   ├── ModuleName-3-EpisodeName.md
+│   │   └── quiz
+│   │       ├── quiz_in_episodes.md
+│   │       └── solution_for_quiz_in_episodes.md
+│   ├── index.md
+│   ├── instructor-guide.md
+│   ├── reference-for-learners.md
+│   └── _static
+│       └── slides
+│           ├── slides-3-EpisodeName.pdf
+│           └── slides-3-EpisodeName.pptx
+├── LICENSE
+├── LICENSE.code
+├── make.bat
+├── Makefile
+├── pylock.toml
+├── pyproject.toml
+└── README.md
+</pre></div>
+</div>
+</section>
+<section id="the-conf-py-file">
+<h2>The <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> file<a class="headerlink" href="#the-conf-py-file" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> file contains all the configuration for Sphinx. This
+includes details like title, authors, Sphinx extensions and their
+configuration. Some comments with <code class="docutils literal notranslate"><span class="pre">FIXME:</span></code> is provided where
+appropriate replacements should be made.</p>
+</section>
+<section id="the-index-md-file">
+<h2>The <code class="docutils literal notranslate"><span class="pre">index.md</span></code> file<a class="headerlink" href="#the-index-md-file" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">index.md</span></code> file is the landing page of the course. This should
+include:</p>
+<ul class="simple">
+<li><p>Title of this module</p></li>
+<li><p>General description (1–3 paragraphs)</p></li>
+<li><p><strong>Prerequisites</strong></p>
+<ul>
+<li><p>Reading materials or other preparation required before starting this module</p></li>
+</ul>
+</li>
+<li><p>Links to episodes in correct order</p>
+<ul>
+<li><p>Must use the <a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/syntax/organising_content.html#syntax-toctree" title="MyST Parser 5.1.0">toctree syntax</a></p></li>
+<li><p>At least three sections should be included:</p>
+<ul>
+<li><ol class="arabic simple">
+<li><p><strong>Software setup</strong> – instructions for configuring the programming environment</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p><strong>Episodes</strong> – teaching content of the module divided into smaller units called episodes</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="3">
+<li><p><strong>Reference</strong> – notes for instructors and additional resources</p></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Learning outcomes</strong> (following Bloom’s Taxonomy guidelines)<a class="footnote-reference brackets" href="#gpt-learn-out" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p>
+<ul>
+<li><p>Target learners and practical skills they will gain</p></li>
+<li><p><strong>Links to relevant leaves in the skill tree</strong></p></li>
+<li><p>Optionally, mention related topics not covered in this module and link them to the skill tree</p></li>
+</ul>
+</li>
+<li><p><strong>Credit</strong> (to be reformulated ASAP)</p></li>
+<li><p><strong>License</strong> (to be reformulated ASAP)</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference internal" href="../index.html"><span class="std std-doc">index.md file</span></a> of this very own module template. You can view the source, by clicking on the <em>eye icon</em> on the top.</p>
+</div>
+</section>
+<section id="episode-on-setting-up-programming-environment">
+<h2>Episode on <em>setting up programming environment</em><a class="headerlink" href="#episode-on-setting-up-programming-environment" title="Link to this heading">¶</a></h2>
+<p>Provide a dedicated notebook (Markdown or reStructuredText also acceptable) with at least two sessions covering environment setup:</p>
+<ul class="simple">
+<li><p><strong>Local installation</strong></p>
+<ul>
+<li><p>Specify package versions (<em>e.g.</em>, via <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> or <code class="docutils literal notranslate"><span class="pre">environment.yml</span></code>)</p></li>
+<li><p>Detailed setup instructions for Windows, macOS, and Linux users</p></li>
+<li><p>Optionally provide a containerized setup</p></li>
+</ul>
+</li>
+<li><p><strong>HPC cluster installation</strong></p>
+<ul>
+<li><p>Instructions valid for a specific supercomputer (preferably an EuroHPC cluster)</p></li>
+<li><p>Specify package versions (as above)</p></li>
+<li><p>Optionally provide a containerized setup</p></li>
+<li><p>Example SLURM batch script for running exercises</p></li>
+</ul>
+</li>
+<li><p><strong>Datasets</strong></p>
+<ul>
+<li><p>If a dataset is required and smaller than 100 MB, include it directly</p></li>
+<li><p>If larger, provide instructions for downloading it from an external archive</p></li>
+</ul>
+</li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference internal" href="../episodes/Python-HPDA-0-SoftwareSetup.html"><span class="std std-doc">setup episode</span></a>.</p>
+</div>
+</section>
+<section id="episodes-for-teaching">
+<h2>Episodes for teaching<a class="headerlink" href="#episodes-for-teaching" title="Link to this heading">¶</a></h2>
+<p>These episodes are the core content which introduces and goes
+deeper into the topic at hand. Each episode should include:</p>
+<ul class="simple">
+<li><p>A general description</p></li>
+<li><p><strong>Objectives</strong> for learners</p></li>
+<li><p><strong>Instructor note</strong> (suggested time allocation, code demos, exercises, etc.)</p></li>
+<li><p>At least one of the following between major sections:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Discussion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Code</span> <span class="pre">for</span> <span class="pre">demonstration</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Exercise</span></code> (with corresponding <code class="docutils literal notranslate"><span class="pre">Solution</span></code>)</p></li>
+</ul>
+</li>
+<li><p>Highlighted notifications such as <code class="docutils literal notranslate"><span class="pre">Note</span></code>, <code class="docutils literal notranslate"><span class="pre">Caution</span></code>, <code class="docutils literal notranslate"><span class="pre">Attention</span></code>, <em>etc.</em></p>
+<ul>
+<li><p>See the Jupyter Notebook titled <strong>Reference for module developers</strong> for more options</p></li>
+</ul>
+</li>
+<li><p><strong>Images</strong> to illustrate key concepts (stored in an images directory)</p></li>
+<li><p><strong>Videos</strong> if needed to demonstrate continuous processes</p>
+<ul>
+<li><p>Videos may be provided directly or linked from YouTube</p></li>
+</ul>
+</li>
+<li><p><strong>Code examples</strong> stored in a code directory, with references in the notebook</p></li>
+<li><p><strong>Keypoints</strong> at the end of the episode, summarizing its content</p></li>
+<li><p><strong>See also</strong> with additional reading materials</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>You can look at any of the episodes in this current example module.
+If you are starting something new, use
+<a class="reference internal" href="../episodes/ModuleName-1-EpisodeName.html"><span class="std std-doc">this boilerplate episode</span></a>.</p>
+</div>
+</section>
+<section id="quiz">
+<h2>Quiz<a class="headerlink" href="#quiz" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Provide summative assessment questions suitable for supervised or unsupervised evaluation</p></li>
+<li><p>Formats may include:</p>
+<ul>
+<li><p>Multiple-choice questions</p></li>
+<li><p>Coding tasks</p></li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The current page on <a class="reference internal" href="../episodes/quiz/quiz_in_episodes.html"><span class="std std-doc">quiz</span></a> is for demonstration purposes only. The format
+may change.</p>
+</div>
+</section>
+<section id="instructor-guide">
+<h2>Instructor guide<a class="headerlink" href="#instructor-guide" title="Link to this heading">¶</a></h2>
+<p>The instructor guide should include:</p>
+<ul class="simple">
+<li><p>Recommended teaching hours and participant numbers</p></li>
+<li><p>Mode of teaching and exercises</p></li>
+<li><p>Hardware requirements (including HPC if applicable)</p></li>
+<li><p>Learner personas</p></li>
+<li><p>Additional teaching recommendations</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference internal" href="../instructor-guide.html"><span class="std std-doc">instructor guide</span></a> in the current example module.</p>
+</div>
+</section>
+<section id="reference-for-learners">
+<h2>Reference for Learners<a class="headerlink" href="#reference-for-learners" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Glossary of terms</p></li>
+<li><p>External resources for further study</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference internal" href="../reference-for-learners.html"><span class="std std-doc">reference for learners</span></a> in the current example module.</p>
+</div>
+</section>
+<section id="the-citation-cff-file">
+<h2>The <code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code> file<a class="headerlink" href="#the-citation-cff-file" title="Link to this heading">¶</a></h2>
+<p>This citation file format file encodes metadata such as author
+information, affiliation and so on. You are also expected to
+tag appropriate skills related to
+<a class="reference external" href="https://www.hpc-certification.org/wiki/skill-tree/b">HPC certification forum’s skill tree</a> under the <code class="docutils literal notranslate"><span class="pre">identifiers</span></code> field.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">identifiers</span><span class="p">:</span>
+  <span class="o">-</span> <span class="nb">type</span><span class="p">:</span> <span class="n">url</span>
+    <span class="n">value</span><span class="p">:</span> <span class="o">&gt;-</span>
+      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">hpc</span><span class="o">-</span><span class="n">certification</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">wiki</span><span class="o">/</span><span class="n">skill</span><span class="o">-</span><span class="n">tree</span><span class="o">/</span><span class="n">bda</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="mi">6</span><span class="o">/</span><span class="n">b</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">BDA2</span><span class="mf">.6</span> <span class="n">Dask</span>
+  <span class="o">-</span> <span class="nb">type</span><span class="p">:</span> <span class="n">url</span>
+    <span class="n">value</span><span class="p">:</span> <span class="o">&gt;-</span>
+      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">hpc</span><span class="o">-</span><span class="n">certification</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">wiki</span><span class="o">/</span><span class="n">skill</span><span class="o">-</span><span class="n">tree</span><span class="o">/</span><span class="n">sd</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="n">b</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">SD1</span><span class="mf">.1</span> <span class="n">Programming</span> <span class="n">Languages</span>
+  <span class="o">-</span> <span class="nb">type</span><span class="p">:</span> <span class="n">url</span>
+    <span class="n">value</span><span class="p">:</span> <span class="o">&gt;-</span>
+      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">hpc</span><span class="o">-</span><span class="n">certification</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">wiki</span><span class="o">/</span><span class="n">skill</span><span class="o">-</span><span class="n">tree</span><span class="o">/</span><span class="n">sd</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="n">b</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">SD1</span><span class="mf">.3</span> <span class="n">Efficient</span> <span class="n">Algorithms</span> <span class="ow">and</span> <span class="n">Data</span> <span class="n">Structures</span>
+  <span class="c1"># - type: doi</span>
+  <span class="c1">#   value: 10.1234/zenodo.4321</span>
+  <span class="c1">#   description: Module archive on Zenodo</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://citation-file-format.github.io/#/create-a-citationcff-file-now">Citation file format generator</a>.</p>
+</div>
+</section>
+</section>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="ref-auth" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://sphinx-evita.readthedocs.io/en/latest/ref-for-module-authors.html">https://sphinx-evita.readthedocs.io/en/latest/ref-for-module-authors.html</a></p>
+</aside>
+<aside class="footnote brackets" id="ref-lesson-design" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://enccs.github.io/instructor-training/lesson-design/">https://enccs.github.io/instructor-training/lesson-design/</a></p>
+</aside>
+<aside class="footnote brackets" id="gpt-learn-out" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>To make an initial draft of the learning outcomes from a course description, authors can use the AI-assisted <a class="reference external" href="https://chatgpt.com/g/g-67768fbf69dc819199207ef9e3d4d697-blooms-taxonomy-for-hpccf/c/68ff9d13-de94-832f-a112-dda046af41b3">Blooms Taxonomy for HPCCF</a> tool.</p>
+</aside>
+</aside>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">High Performance Data Analytics in Python</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Software setup</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../episodes/Python-HPDA-0-SoftwareSetup.html">Setting Up Programming Environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Episodes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../episodes/Python-HPDA-1-Motivation.html">Motivation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../episodes/Python-HPDA-2-EfficientArrayComputing.html">Efficient Array Computing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../episodes/Python-HPDA-2-EfficientArrayComputing-markdown.html">Efficient Array Computing (in Markdown)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../episodes/Python-HPDA-2-EfficientArrayComputing-pdf.html">Efficient Array Computing (in PDF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../episodes/quiz/quiz_in_episodes.html">Quiz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../episodes/ModuleName-1-EpisodeName.html">Your title here</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../instructor-guide.html">Instructor guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference-for-learners.html">Reference for learners</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Walkthrough for module authors</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Structure of an EVITA module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../reference-for-learners.html" title="previous chapter">Reference for learners</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, EVITA project, Ashwin Vishnu Mohanan, Claudia Blaas-Schenner, Jaison Lewis, Jasper Seehofer, Kevin Lüdemann, Kjartan Thor Wikfeldt, Mary Kate Chessey, Matthias Eulert, Tobias Haas, Victoria Döller, Yinyin Ma, and Yonglei Wang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/reference/structure-evita-module.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Efficient Array Computing &#8212; High Performance Data Analytics in Python</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_lesson.css?v=e9df6548" />
+    <link rel="stylesheet" type="text/css" href="../_static/term_role_formatting.css?v=4194e21c" />
+    <link rel="stylesheet" type="text/css" href="../_static/furo_ext_lesson.css?v=6c0cde2e" />
+    <link rel="stylesheet" type="text/css" href="../_static/overrides.css" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=35a8b989"></script>
+    <script src="../_static/minipres.js?v=a0d29692"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Efficient Array Computing (in Markdown)" href="Python-HPDA-2-EfficientArrayComputing-markdown.html" />
+    <link rel="prev" title="Motivation" href="Python-HPDA-1-Motivation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="efficient-array-computing">
+<h1>Efficient Array Computing<a class="headerlink" href="#efficient-array-computing" title="Link to this heading">¶</a></h1>
+<p>This episode introduces how to write high-performance numerical code in Python packages (Numpy, Pandas, and Scipy) by leveraging tools and libraries designed to optimize computation speed and memory usage. It explores strategies such as vectorization with NumPy, just-in-time compilation using Numba, and parallelization techniques that can significantly reduce execution time. These methods help Python developers overcome the traditional performance limitations of the language, making it suitable for intensive scientific and engineering applications.</p>
+<div class="admonition-objectives objectives admonition" id="objectives-0">
+<p class="admonition-title">Objectives</p>
+<ul class="simple">
+<li><p>Understand limitations of Python’s standard library for large data processing</p></li>
+<li><p>Understand the logic behind NumPy ndarrays and learn to use some NumPy numerical computing tools</p></li>
+<li><p>Learn to use data structures and analysis tools from Panda</p></li>
+</ul>
+</div>
+<div class="admonition-instructor-note instructor-note admonition" id="instructor-note-0">
+<p class="admonition-title">Instructor note</p>
+<ul class="simple">
+<li><p>25 min teaching/type-along</p></li>
+<li><p>25 min exercising</p></li>
+</ul>
+</div>
+<section id="why-can-python-be-slow">
+<h2>Why can Python be slow?<a class="headerlink" href="#why-can-python-be-slow" title="Link to this heading">¶</a></h2>
+<p>Computer programs are nowadays practically always written in a high-level human readable programming language and then translated to the actual machine instructions that a processor understands. There are two main approaches for this translation:</p>
+<ul class="simple">
+<li><p>For <strong>compiled</strong> programming languages, the translation is done by a compiler before the execution of the program</p></li>
+<li><p>For <strong>interpreted</strong> languages, the translation is done by an interpreter during the execution of the program</p></li>
+</ul>
+</section>
+<section id="numpy">
+<h2>NumPy<a class="headerlink" href="#numpy" title="Link to this heading">¶</a></h2>
+<p>NumPy is based on well-optimized C code, which gives much better performace than regular Python. In particular, by using homogeneous data structures, NumPy <em>vectorizes</em> mathematical operations where fast pre-compiled code can be applied to a sequence of data instead of using traditional <code class="docutils literal notranslate"><span class="pre">for</span></code> loops.</p>
+<section id="arrays">
+<h3>Arrays<a class="headerlink" href="#arrays" title="Link to this heading">¶</a></h3>
+<p>The core of NumPy is the NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> (n-dimensional array). Compared to a Python list, an ndarray is similar in terms of serving as a data container. Some differences between the two are:</p>
+<ul class="simple">
+<li><p>ndarrays can have multiple dimensions, <em>e.g.</em> a 1-D array is a vector, a 2-D array is a matrix</p></li>
+<li><p>ndarrays are fast only when all data elements are of the same type</p></li>
+</ul>
+<p><img alt="" src="../_images/python-list-vs-numpy-array.svg" /></p>
+</section>
+<section id="creating-numpy-arrays">
+<h3>Creating NumPy arrays<a class="headerlink" href="#creating-numpy-arrays" title="Link to this heading">¶</a></h3>
+<p>One way to create a NumPy array is to convert from a Python list, but make sure that the list is homogeneous (contains same data type) otherwise performace will be downgraded. Since appending elements to an existing array is slow, it is a common practice to preallocate the necessary space with <code class="docutils literal notranslate"><span class="pre">np.zeros</span></code> or <code class="docutils literal notranslate"><span class="pre">np.empty</span></code> when converting from a Python list is not possible.</p>
+<div class="admonition-code-for-demonstration demo admonition" id="demo-0">
+<p class="admonition-title">Code for demonstration</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;a = </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># array([ 1., 2., 3., 4.])</span>
+
+<span class="n">list1</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]]</span>
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">list1</span><span class="p">,</span> <span class="nb">complex</span><span class="p">)</span>
+<span class="c1"># create complex array, with imaginary part equal to zero</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mat = </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">mat</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># array([[ 1.+0.j, 2.+0.j, 3.+0.j],</span>
+<span class="c1">#       [ 4.+0.j, 5.+0.j, 6.+0.j]])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mat.shape=</span><span class="si">{</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, mat.size=</span><span class="si">{</span><span class="n">mat</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># mat.shape=(2, 3), mat.size=6</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>You should copy the code above to a separate code block, or change its cell type from from <code class="docutils literal notranslate"><span class="pre">Markdown</span></code> to <code class="docutils literal notranslate"><span class="pre">Code</span></code>.</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">arange</span></code> and <code class="docutils literal notranslate"><span class="pre">linspace</span></code> can generate ranges of numbers:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0 1 2 3 4 5 6 7 8 9]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0.1  0.12 0.14 0.16 0.18]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[-4.5  -2.25  0.    2.25  4.5 ]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="array-operations-and-manipulations">
+<h3>Array operations and manipulations<a class="headerlink" href="#array-operations-and-manipulations" title="Link to this heading">¶</a></h3>
+<p>All the familiar arithmetic operators in NumPy are applied elementwise:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1D example</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; a + b = </span><span class="si">{</span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="si">}</span><span class="se">\n</span><span class="s2"> a / b = </span><span class="si">{</span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> a + b = [5 7 9]
+ a / b = [0.25 0.4  0.5 ]
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="" src="../_images/np_add_1d_new.svg" /></p>
+<p><img alt="" src="../_images/np_div_1d_new.svg" /></p>
+<div class="admonition-exercise exercise important admonition" id="exercise-0">
+<p class="admonition-title">Exercise</p>
+<p>Run the code below to get familiar with indexing in a 2D example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2D example</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can either copy the code from the cell above or download the code example from <a class="reference download internal" download="" href="../_downloads/f696d37fe9b27a8f4ddf7c1bee3a26ca/code-example.py"><span class="xref download myst">HERE</span></a>.</p>
+</div>
+<div class="admonition-solution solution important dropdown admonition" id="solution-0">
+<p class="admonition-title">Solution</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">11</span> <span class="mi">12</span> <span class="mi">13</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">14</span> <span class="mi">15</span> <span class="mi">16</span><span class="p">]]</span>
+
+</pre></div>
+</div>
+<p><img alt="" src="../_images/np_add_2d.svg" /></p>
+</div>
+</div>
+</section>
+<section id="array-indexing">
+<h3>Array indexing<a class="headerlink" href="#array-indexing" title="Link to this heading">¶</a></h3>
+<p>Basic indexing is similar to Python lists. Note that advanced indexing creates copies of arrays.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1D example</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">])</span>
+
+<span class="c1"># integer indexing</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Integer indexing&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data = </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[3] = </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[0:2] = </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[-2] = </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[::-4] = </span><span class="si">{</span><span class="n">data</span><span class="p">[::</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># fancy indexing</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Fancy indexing&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[[1,6,3]] = </span><span class="si">{</span><span class="n">data</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">]]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># boolean indexing</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Boolean indexing&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[data&gt;5] = </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">&gt;</span><span class="mi">5</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Integer indexing
+data = [1 2 3 4 5 6 7 8]
+data[3] = 4
+data[0:2] = [1 2]
+data[-2] = 7
+data[::-4] = [8 4]
+
+Fancy indexing
+data[[1,6,3]] = [2 7 4]
+
+Boolean indexing
+data[data&gt;5] = [6 7 8]
+</pre></div>
+</div>
+</div>
+</div>
+<p><a class="reference internal" href="../_images/array-indexing-1D.png"><img alt="" class="align-center" src="../_images/array-indexing-1D.png" style="width: 30em;" /></a></p>
+<div class="admonition-exercise exercise important admonition" id="exercise-1">
+<p class="admonition-title">Exercise</p>
+<p>Run the code below to get familiar with indexing in a 2D example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2D example</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">],[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+
+<span class="c1"># integer indexing</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Integer indexing&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[1] = </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[:, 1] = </span><span class="si">{</span><span class="n">data</span><span class="p">[:,</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[1:3, 2:4] = </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># fancy indexing</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Fancy indexing&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[[0,2,1], [2,3,0]] = </span><span class="si">{</span><span class="n">data</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">]]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># boolean indexing</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Boolean indexing&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data[data&gt;10] = </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">&gt;</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Again, you should move the code above to a separate code block, or change its cell type from from <code class="docutils literal notranslate"><span class="pre">Markdown</span></code> to <code class="docutils literal notranslate"><span class="pre">Code</span></code>.</p>
+</div>
+</section>
+<section id="i-o-with-numpy">
+<h3>I/O with NumPy<a class="headerlink" href="#i-o-with-numpy" title="Link to this heading">¶</a></h3>
+<p>Numpy provides functions for reading from/writing to files. Both ASCII and binary formats are supported with the CSV and npy/npz formats.</p>
+<p><strong>CSV</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">numpy.loadtxt()</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy.savetxt()</span></code> functions can be used. They save in a regular column layout and can deal with different delimiters, column titles and numerical representations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s2">&quot;my_array.csv&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;my_array.csv&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[ True  True  True  True]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>If you get an eror like xxx, you should import numpy before the first line <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">numpy</span> <span class="pre">as</span> <span class="pre">np</span></code>.</p>
+</div>
+<p><strong>Binary</strong></p>
+<p>The npy format is a binary format used to dump arrays of any shape. Several arrays can be saved into a single npz file, which is simply a zipped collection of different npy files. All the arrays to be saved into a npz file can be passed as kwargs to the <code class="docutils literal notranslate"><span class="pre">numpy.savez()</span></code> function. The data can then be recovered using the <code class="docutils literal notranslate"><span class="pre">numpy.load()</span></code> method, which returns a dictionary-like object in which each key points to one of the arrays.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="s2">&quot;my_arrays.npz&quot;</span><span class="p">,</span> <span class="n">array_1</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">array_2</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;my_arrays.npz&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;array_1&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span> <span class="c1"># [ True  True  True  True]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;array_2&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">)</span> <span class="c1"># [ True  True  True  True]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[ True  True  True  True]
+[ True  True  True  True]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="random-numbers">
+<h3>Random numbers<a class="headerlink" href="#random-numbers" title="Link to this heading">¶</a></h3>
+<p>The module <code class="docutils literal notranslate"><span class="pre">numpy.random</span></code> provides several functions for constructing random arrays</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">random()</span></code>: uniform random numbers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">normal()</span></code>: normal distribution</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">choice()</span></code>: random sample from given array</p></li>
+<li><p>…</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[0.29927916 0.53493187]
+ [0.7167687  0.79684072]] 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[1 3 1 0 1 3 3 0 2 3]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You might get different results from the above code example.</p>
+</div>
+</section>
+</section>
+<section id="pandas">
+<h2>Pandas<a class="headerlink" href="#pandas" title="Link to this heading">¶</a></h2>
+<p>Pandas is a Python package that provides high-performance and easy to use data structures and data analysis tools. The core data structures of Pandas are Series and Dataframes.</p>
+<ul class="simple">
+<li><p>a Pandas <code class="docutils literal notranslate"><span class="pre">series</span></code> is a one-dimensional NumPy array with an index which we could use to access the data</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> consist of a table of values with labels for each row and column. A dataframe can combine multiple data types, such as numbers and text, but the data in each column is of the same type.</p></li>
+<li><p>each column of a dataframe is a series object - a dataframe is thus a collection of series.</p></li>
+</ul>
+<p><a class="reference internal" href="../_images/pandas_dataframe.svg"><img alt="" class="align-center" src="../_images/pandas_dataframe.svg" style="width: 30em;" /></a></p>
+<section id="data-analysis-workflow">
+<h3>Data analysis workflow<a class="headerlink" href="#data-analysis-workflow" title="Link to this heading">¶</a></h3>
+<p>Pandas is a powerful tool for many steps of a data analysis pipeline:</p>
+<p>To explore some of the capabilities, we start with an example dataset containing the passenger list from the Titanic, which is often used in Kaggle competitions and data science tutorials. First step is to load Pandas and download the dataset into a dataframe.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/pandas-dev/pandas/master/doc/data/titanic.csv&quot;</span>
+
+<span class="c1"># set the index to the &quot;Name&quot; column</span>
+<span class="n">titanic</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;Name&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pandas also understands multiple other formats, for example <code class="docutils literal notranslate"><span class="pre">read_excel()</span></code>, <code class="docutils literal notranslate"><span class="pre">read_hdf()</span></code>, <code class="docutils literal notranslate"><span class="pre">read_json()</span></code>, <em>etc.</em> (and corresponding methods to write to file: <code class="docutils literal notranslate"><span class="pre">to_csv()</span></code>, <code class="docutils literal notranslate"><span class="pre">to_excel()</span></code>, <code class="docutils literal notranslate"><span class="pre">to_hdf()</span></code>, <code class="docutils literal notranslate"><span class="pre">to_json()</span></code>, …)…)</p>
+</div>
+<p>We can now view the dataframe to get an idea of what it contains and print some summary statistics of its numerical data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># print the first 5 lines of the dataframe</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># print some information about the columns</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+
+<span class="c1"># print summary statistics for each column</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="missing-invalid-data">
+<h3>Missing/invalid data<a class="headerlink" href="#missing-invalid-data" title="Link to this heading">¶</a></h3>
+<p>What if your dataset has missing data? Pandas uses the value np.nan to represent missing data, and by default does not include it in any computations. We can find missing values, drop them from our dataframe, replace them with any value we like or do forward or backward filling.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span>                           <span class="c1"># returns boolean mask of NaN values</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>                  <span class="c1"># drop missing values</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">))</span>         <span class="c1"># or how=&quot;all&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Cabin&quot;</span><span class="p">]))</span>  <span class="c1"># only drop NaNs from one column</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>                 <span class="c1"># replace NaNs with zero</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="scipy">
+<h2>Scipy<a class="headerlink" href="#scipy" title="Link to this heading">¶</a></h2>
+<p>SciPy is a library that builds on top of NumPy. It contains a lot of interfaces to battle-tested numerical routines written in Fortran or C, as well as Python implementations of many common algorithms.</p>
+<p>Let us look more closely into one out of the countless useful functions available in SciPy. <code class="docutils literal notranslate"><span class="pre">curve_fit()</span></code> is a non-linear least squares fitting function. NumPy has least-squares fitting via the <code class="docutils literal notranslate"><span class="pre">np.linalg.lstsq()</span></code> function, but we need to go to SciPy to find non-linear curve fitting. This example fits a power-law to a vector.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">curve_fit</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">powerlaw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+<span class="c1"># data</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">9115</span><span class="p">,</span> <span class="mi">8368</span><span class="p">,</span> <span class="mi">7711</span><span class="p">,</span> <span class="mi">5480</span><span class="p">,</span> <span class="mi">3492</span><span class="p">,</span> <span class="mi">3376</span><span class="p">,</span> <span class="mi">2884</span><span class="p">,</span> <span class="mi">2792</span><span class="p">,</span> <span class="mi">2703</span><span class="p">,</span> <span class="mi">2701</span><span class="p">])</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1.0</span>
+
+<span class="c1"># initial guess for variables</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1"># fit data</span>
+<span class="n">params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">powerlaw</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">ydata</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A =&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;+/-&quot;</span><span class="p">,</span> <span class="n">cov</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;s =&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;+/-&quot;</span><span class="p">,</span> <span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A = 10240.788123784849 +/- 984.5879720590807
+s = -0.5372630409593478 +/- 0.08171727565402351
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># optionally plot</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw data&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">powerlaw</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;power law&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/dcfb7477ca9a0a2a0ef504e6f5f93b7fc1cec663c6319d401b39ab5bc584b7a7.png" src="../_images/dcfb7477ca9a0a2a0ef504e6f5f93b7fc1cec663c6319d401b39ab5bc584b7a7.png" />
+</div>
+</div>
+</section>
+<section id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">¶</a></h2>
+<div class="admonition-working-effectively-with-dataframes exercise important admonition" id="exercise-2">
+<p class="admonition-title">Working effectively with dataframes</p>
+<p>Recall the <code class="docutils literal notranslate"><span class="pre">curve_fit()</span></code> method from SciPy discussed above, and imagine that we want to fit powerlaws to every row in a large dataframe. How can this be done effectively?</p>
+<p>First define the <code class="docutils literal notranslate"><span class="pre">powerlaw()</span></code> function and another function for fitting a row of numbers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">curve_fit</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">powerlaw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_powerlaw</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1.0</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">powerlaw</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">ydata</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Next load a dataset with multiple rows similar to the one used in the example above:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/ENCCS/hpda-python/main/content/data/results.csv&quot;</span><span class="p">)</span>
+<span class="c1"># print first few rows</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now consider these four different ways of fitting a powerlaw to each row of the dataframe:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Loop</span>
+
+<span class="n">powers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">row_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row_indx</span><span class="p">,</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">fit_powerlaw</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">powers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. `iterrows()</span>
+
+<span class="n">powers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">row_indx</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">fit_powerlaw</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">powers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. `apply()</span>
+
+<span class="n">powers</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fit_powerlaw</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. `apply()` with `raw=True`</span>
+
+<span class="c1"># raw=True passes numpy ndarrays instead of series to fit_powerlaw</span>
+<span class="n">powers</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fit_powerlaw</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Which one do you think is most efficient? You can measure the execution time by adding <code class="docutils literal notranslate"><span class="pre">%%timeit</span></code> to the first line of a Jupyter code cell. More on timing and profiling in a later episode.</p>
+</div>
+<div class="admonition-working-effectively-with-dataframes solution important dropdown admonition" id="solution-1">
+<p class="admonition-title">Working effectively with dataframes</p>
+<p>The execution time for four different methods are described below. Note that you may get different numbers when you run these examples.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1 Loop</span>
+
+<span class="o">%%</span><span class="n">timeit</span>
+<span class="n">powers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">row_indx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+   <span class="n">row</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row_indx</span><span class="p">,</span><span class="mi">1</span><span class="p">:]</span>
+   <span class="n">p</span> <span class="o">=</span> <span class="n">fit_powerlaw</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+   <span class="n">powers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="c1"># 33.6 ms ± 682 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. `iterrows()`</span>
+
+<span class="o">%%</span><span class="n">timeit</span>
+<span class="n">powers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">row_indx</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+   <span class="n">p</span> <span class="o">=</span> <span class="n">fit_powerlaw</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+   <span class="n">powers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="c1"># 28.7 ms ± 947 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. `apply()`</span>
+
+<span class="o">%%</span><span class="n">timeit</span>
+<span class="n">powers</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fit_powerlaw</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># 26.1 ms ± 1.19 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. `apply()` with `raw=True`</span>
+
+<span class="o">%%</span><span class="n">timeit</span>
+<span class="n">powers</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fit_powerlaw</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 24 ms ± 1.27 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-further-analysis-of-titanic-passenger-list-dataset exercise important admonition" id="exercise-3">
+<p class="admonition-title">Further analysis of Titanic passenger list dataset</p>
+<p>Consider the titanic dataset.</p>
+<blockquote>
+<div><p>If you haven’t done so already, load it into a dataframe before the exercises:</p>
+<p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pandas</span> <span class="pre">as</span> <span class="pre">pd;</span> <span class="pre">url</span> <span class="pre">=</span> <span class="pre">&quot;https://raw.githubusercontent.com/pandas-dev/pandas/master/doc/data/titanic.csv&quot;;</span> <span class="pre">titanic</span> <span class="pre">=</span> <span class="pre">pd.read_csv(url,</span> <span class="pre">index_col=&quot;Name&quot;)</span></code></p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Compute the mean age of the first 10 passengers by slicing and the <code class="docutils literal notranslate"><span class="pre">mean</span></code> method</p></li>
+<li><p>Using boolean indexing, compute the survival rate (mean of “Survived” values) among passengers over and under the average age.
+Now investigate the family size of the passengers (<em>i.e.</em> the “SibSp” column):</p></li>
+<li><p>What different family sizes exist in the passenger list?</p>
+<ul>
+<li><p><strong>Hint</strong>: try the <code class="docutils literal notranslate"><span class="pre">unique()</span></code> method</p></li>
+</ul>
+</li>
+<li><p>What are the names of the people in the largest family group?</p></li>
+<li><p>(Advanced) Create histograms showing the distribution of family sizes for passengers split by the fare, i.e. one group of high-fare passengers (where the fare is above average) and one for low-fare passengers</p>
+<ul>
+<li><p><strong>Hint</strong>: instead of an existing column name, you can give a lambda function as a parameter to <code class="docutils literal notranslate"><span class="pre">hist</span></code> to compute a value on the fly. For example <code class="docutils literal notranslate"><span class="pre">lambda</span> <span class="pre">x:</span> <span class="pre">&quot;Poor&quot;</span> <span class="pre">if</span> <span class="pre">titanic[&quot;Fare&quot;].loc[x]</span> <span class="pre">&lt;</span> <span class="pre">titanic[&quot;Fare&quot;].mean()</span> <span class="pre">else</span> <span class="pre">&quot;Rich&quot;</span></code>).</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition-solution solution important dropdown admonition" id="solution-2">
+<p class="admonition-title">Solution</p>
+<ol class="arabic simple">
+<li><p>Mean age of the first 10 passengers:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">titanic.iloc[:10,:][&quot;Age&quot;].mean()</span></code> or</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">titanic.iloc[:10,4].mean()</span></code> or</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">titanic.loc[:&quot;Nasser,</span> <span class="pre">Mrs.</span> <span class="pre">Nicholas</span> <span class="pre">(Adele</span> <span class="pre">Achem)&quot;,</span> <span class="pre">&quot;Age&quot;].mean()</span></code></p></li>
+</ul>
+</li>
+<li><p>Survival rate among passengers over and under average age:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">titanic[titanic[&quot;Age&quot;]</span> <span class="pre">&gt;</span> <span class="pre">titanic[&quot;Age&quot;].mean()][&quot;Survived&quot;].mean()</span></code> and</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">titanic[titanic[&quot;Age&quot;]</span> <span class="pre">&lt;</span> <span class="pre">titanic[&quot;Age&quot;].mean()][&quot;Survived&quot;].mean()</span></code></p></li>
+</ul>
+</li>
+<li><p>Existing family sizes: <code class="docutils literal notranslate"><span class="pre">titanic[&quot;SibSp&quot;].unique()</span></code></p></li>
+<li><p>Names of members of largest family(ies): <code class="docutils literal notranslate"><span class="pre">titanic[titanic[&quot;SibSp&quot;]</span> <span class="pre">==</span> <span class="pre">8].index</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">titanic.hist(&quot;SibSp&quot;,</span> <span class="pre">lambda</span> <span class="pre">x:</span> <span class="pre">&quot;Poor&quot;</span> <span class="pre">if</span> <span class="pre">titanic[&quot;Fare&quot;].loc[x]</span> <span class="pre">&lt;</span> <span class="pre">titanic[&quot;Fare&quot;].mean()</span> <span class="pre">else</span> <span class="pre">&quot;Rich&quot;,</span> <span class="pre">rwidth=0.9)</span></code></p></li>
+</ol>
+</div>
+<div class="admonition-keypoints keypoints admonition" id="keypoints-0">
+<p class="admonition-title">Keypoints</p>
+<ul class="simple">
+<li><p>NumPy provides a static array data structure, fast mathematical operations for arrays and tools for linear algebra and random numbers</p></li>
+<li><p>Pandas dataframes are a good data structure for tabular data</p></li>
+<li><p>Dataframes allow both simple and advanced analysis in very compact form</p></li>
+<li><p>SciPy contains a lot of interfaces to battle-tested numerical routines</p></li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://uppmax.github.io/R-python-julia-matlab-HPC/">Introduction to running R, Python, Julia, and Matlab in HPC</a></p></li>
+<li><p><a class="reference external" href="https://github.com/ENCCS/webinar_documents/tree/main/2024-oct-24-python">Practical Intro to GPU Programming using Python</a></p></li>
+<li><p><a class="reference external" href="https://uppmax.github.io/HPC-python/">Using Python in an HPC environment</a></p></li>
+<li><p><a class="reference external" href="https://aaltoscicomp.github.io/python-for-scicomp/">Python for Scientific Computing</a></p></li>
+<li><p>…</p></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">High Performance Data Analytics in Python</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Software setup</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Python-HPDA-0-SoftwareSetup.html">Setting Up Programming Environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Episodes</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Python-HPDA-1-Motivation.html">Motivation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Efficient Array Computing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Python-HPDA-2-EfficientArrayComputing-markdown.html">Efficient Array Computing (in Markdown)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Python-HPDA-2-EfficientArrayComputing-pdf.html">Efficient Array Computing (in PDF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quiz/quiz_in_episodes.html">Quiz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ModuleName-1-EpisodeName.html">Your title here</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../instructor-guide.html">Instructor guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference-for-learners.html">Reference for learners</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Walkthrough for module authors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/structure-evita-module.html">Structure of an EVITA module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Python-HPDA-1-Motivation.html" title="previous chapter">Motivation</a></li>
+      <li>Next: <a href="Python-HPDA-2-EfficientArrayComputing-markdown.html" title="next chapter">Efficient Array Computing (in Markdown)</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, EVITA project, Ashwin Vishnu Mohanan, Claudia Blaas-Schenner, Jaison Lewis, Jasper Seehofer, Kevin Lüdemann, Kjartan Thor Wikfeldt, Mary Kate Chessey, Matthias Eulert, Tobias Haas, Victoria Döller, Yinyin Ma, and Yonglei Wang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/episodes/Python-HPDA-2-EfficientArrayComputing.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

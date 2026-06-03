@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>High Performance Data Analytics in Python &#8212; High Performance Data Analytics in Python</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_lesson.css?v=e9df6548" />
+    <link rel="stylesheet" type="text/css" href="_static/term_role_formatting.css?v=4194e21c" />
+    <link rel="stylesheet" type="text/css" href="_static/furo_ext_lesson.css?v=6c0cde2e" />
+    <link rel="stylesheet" type="text/css" href="_static/overrides.css" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=35a8b989"></script>
+    <script src="_static/minipres.js?v=a0d29692"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Setting Up Programming Environment" href="episodes/Python-HPDA-0-SoftwareSetup.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="high-performance-data-analytics-in-python">
+<h1>High Performance Data Analytics in Python<a class="headerlink" href="#high-performance-data-analytics-in-python" title="Link to this heading">¶</a></h1>
+<p>Scientists, engineers and professionals from many sectors are seeing an enormous growth in the size and number of datasets relevant to their domains. Professional titles have emerged to describe specialists working with data, such as data scientists and data engineers, but also other experts are finding it necessary to learn tools and techniques to work with big data. Typical tasks include preprocessing, analysing, modeling and visualising data.</p>
+<p>Python is an industry-standard programming language for working with data on all levels of the data analytics pipeline. This is in large part because of the rich ecosystem of libraries ranging from generic numerical libraries to special-purpose and/or domain-specific packages, often supported by large developer communities and stable funding sources.</p>
+<p>This module will give an overview of working with research data in Python using general libraries for storing, processing, analysing and sharing data. The focus is on high performance. After covering tools for performant processing on single workstations the focus shifts to profiling and optimising, parallel and distributed computing.</p>
+<div class="admonition-prerequisites prerequisites admonition" id="prerequisites-0">
+<p class="admonition-title">Prerequisites</p>
+<ul class="simple">
+<li><p>Basic experience with Python</p></li>
+<li><p>Basic experience in working in a Linux-like terminal</p></li>
+<li><p>Some prior experience in working with large or small datasets</p></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Software setup</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-0-SoftwareSetup.html">Setting Up Programming Environment</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Episodes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-1-Motivation.html">Motivation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-2-EfficientArrayComputing.html">Efficient Array Computing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-2-EfficientArrayComputing-markdown.html">Efficient Array Computing (in Markdown)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-2-EfficientArrayComputing-pdf.html">Efficient Array Computing (in PDF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/quiz/quiz_in_episodes.html">Quiz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/ModuleName-1-EpisodeName.html">Your title here</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="instructor-guide.html">Instructor guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference-for-learners.html">Reference for learners</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Walkthrough for module authors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/structure-evita-module.html">Structure of an EVITA module</a></li>
+</ul>
+</div>
+<section id="learning-outcomes">
+<h2>Learning outcomes<a class="headerlink" href="#learning-outcomes" title="Link to this heading">¶</a></h2>
+<p>This material is for all researchers and engineers who work with large or small datasets and who want to learn powerful tools and best practices for writing more performant, parallelised, robust and reproducible data analysis pipelines.</p>
+<p>By the end of this module, learners should:</p>
+<ul class="simple">
+<li><p>Have a good overview of available tools and libraries for improving performance in Python (<strong>link to leaves in skill tree</strong>)</p></li>
+<li><p>Knowing libraries for efficiently storing, reading and writing large data  (<strong>link to leaves in skill tree</strong>)</p></li>
+<li><p>Be comfortable working with NumPy arrays and Pandas dataframes for data analysis using Python (<strong>link to leaves in skill tree</strong>)</p></li>
+<li><p>…</p></li>
+</ul>
+<div class="warning admonition">
+<p class="admonition-title">Credit</p>
+<p>Don’t forget to check out additional <a class="reference external" href="https://www.evitahpc.eu/"><strong>course materials</strong></a> from XXX. Please <a class="reference external" href="https://www.evitahpc.eu/"><strong>contact us</strong></a> if you want to reuse these course materials in your teaching. You can also join the <a class="reference external" href="https://www.evitahpc.eu/"><strong>XXX channel</strong></a> to share your experience and get more help from the community.</p>
+</div>
+<div class="attention admonition">
+<p class="admonition-title">License</p>
+<div class="attention dropdown admonition">
+<p class="admonition-title">CC BY-SA for media and pedagogical material</p>
+<p>Copyright © 2026, EVITA project, Ashwin Vishnu Mohanan, Claudia Blaas-Schenner, Jaison Lewis, Jasper Seehofer, Kevin Lüdemann, Kjartan Thor Wikfeldt, Mary Kate Chessey, Matthias Eulert, Tobias Haas, Victoria Döller, Yinyin Ma, and Yonglei Wang. This material is released by EVITA project, Ashwin Vishnu Mohanan, Claudia Blaas-Schenner, Jaison Lewis, Jasper Seehofer, Kevin Lüdemann, Kjartan Thor Wikfeldt, Mary Kate Chessey, Matthias Eulert, Tobias Haas, Victoria Döller, Yinyin Ma, and Yonglei Wang under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).</p>
+<p><strong>Canonical URL</strong>: <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/">https://creativecommons.org/licenses/by-sa/4.0/</a></p>
+<p><a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/legalcode.en">See the legal code</a></p>
+<p class="rubric" id="you-are-free-to">You are free to</p>
+<ol class="arabic simple">
+<li><p><strong>Share</strong> — copy and redistribute the material in any medium or format for any purpose, even commercially.</p></li>
+<li><p><strong>Adapt</strong> — remix, transform, and build upon the material for any purpose, even commercially.</p></li>
+<li><p>The licensor cannot revoke these freedoms as long as you follow the license terms.</p></li>
+</ol>
+<p class="rubric" id="under-the-following-terms">Under the following terms</p>
+<ol class="arabic simple">
+<li><p><strong>Attribution</strong> — You must give <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/#ref-appropriate-credit">appropriate credit</a> , provide a link to the license, and <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/#ref-indicate-changes">indicate if changes were made</a> . You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.</p></li>
+<li><p><strong>ShareAlike</strong> — If you remix, transform, or build upon the material, you must distribute your contributions under the <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/#ref-same-license">same license</a> as the original.</p></li>
+<li><p><strong>No additional restrictions</strong> — You may not apply legal terms or <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/#ref-technological-measures">technological measures</a> that legally restrict others from doing anything the license permits.</p></li>
+</ol>
+<p class="rubric" id="notices">Notices</p>
+<p>You do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/deed.en#ref-exception-or-limitation">exception or limitation</a> .</p>
+<p>No warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/deed.en#ref-publicity-privacy-or-moral-rights">publicity, privacy, or moral rights</a> may limit how you use the material.</p>
+<p>This deed highlights only some of the key features and terms of the actual license. It is not a license and has no legal value. You should carefully review all of the terms and conditions of the actual license before using the licensed material.</p>
+</div>
+<div class="attention dropdown admonition">
+<p class="admonition-title">MIT for source code and code snippets</p>
+<p>MIT License</p>
+<p>Copyright (c) 2026, EVITA project, Ashwin Vishnu Mohanan, Claudia Blaas-Schenner, Jaison Lewis, Jasper Seehofer, Kevin Lüdemann, Kjartan Thor Wikfeldt, Mary Kate Chessey, Matthias Eulert, Tobias Haas, Victoria Döller, Yinyin Ma, and Yonglei Wang</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>To module authors</em>: For code you may use any OSI-approved license as mentioned in <a class="reference external" href="https://spdx.org/licenses/">https://spdx.org/licenses/</a>, such as Apache License 2.0, GNU GPLv3, MIT. Please make sure to update the deed above and
+<code class="docutils literal notranslate"><span class="pre">LICENSE.code</span></code> file accordingly.</p>
+</div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">High Performance Data Analytics in Python</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Software setup</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-0-SoftwareSetup.html">Setting Up Programming Environment</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Episodes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-1-Motivation.html">Motivation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-2-EfficientArrayComputing.html">Efficient Array Computing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-2-EfficientArrayComputing-markdown.html">Efficient Array Computing (in Markdown)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/Python-HPDA-2-EfficientArrayComputing-pdf.html">Efficient Array Computing (in PDF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/quiz/quiz_in_episodes.html">Quiz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="episodes/ModuleName-1-EpisodeName.html">Your title here</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="instructor-guide.html">Instructor guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference-for-learners.html">Reference for learners</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Walkthrough for module authors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/structure-evita-module.html">Structure of an EVITA module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="episodes/Python-HPDA-0-SoftwareSetup.html" title="next chapter">Setting Up Programming Environment</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, EVITA project, Ashwin Vishnu Mohanan, Claudia Blaas-Schenner, Jaison Lewis, Jasper Seehofer, Kevin Lüdemann, Kjartan Thor Wikfeldt, Mary Kate Chessey, Matthias Eulert, Tobias Haas, Victoria Döller, Yinyin Ma, and Yonglei Wang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

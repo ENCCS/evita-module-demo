@@ -1,0 +1,268 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "c5d4df30-761b-4643-b73b-a222fe30e7a6",
+   "metadata": {},
+   "source": [
+    "# Motivation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f6917cff-aee9-4dc2-a301-8944646da523",
+   "metadata": {},
+   "source": [
+    "This episode provides a broad overview of this course and the main motivation to attend this course.\n",
+    "\n",
+    ":::{objectives}\n",
+    "- What is big data\n",
+    "- What is the Python programming environment and the ecosystem\n",
+    "- What you will learn during this course\n",
+    "\n",
+    ":::\n",
+    "\n",
+    ":::{instructor-note}\n",
+    "- 20 min teaching/type-along\n",
+    "-  0 min exercising\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d7b872bc-22bb-4388-9cf9-a71e6179711b",
+   "metadata": {},
+   "source": [
+    "## Big Data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "06178eac-6734-4ec3-82fa-8bed58281851",
+   "metadata": {},
+   "source": [
+    ":::{discussion} How large is your data?\n",
+    "\n",
+    "- How large is the data you are working with?\n",
+    "- Are you experiencing performance bottlenecks when you try to analyse it?\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fa634f18-b72e-4700-a3e5-56ed5d3ca7e2",
+   "metadata": {},
+   "source": [
+    "“Big data refers to data sets that are too large or complex to be dealt with by traditional data-processing application software. […] Big data analysis challenges include capturing data, data storage, data analysis, search, sharing, transfer, visualization, querying, updating, information privacy, and data source.” (from [Wikipedia](https://en.wikipedia.org/wiki/Big_data))\n",
+    "\n",
+    "“Big data” is a current buzzword used heavily in the tech industry, but many scientific research communities are increasingly adopting high-throughput data production methods which lead to very large datasets. One driving force behind this development is the advent of powerful machine learning methods which enable researchers to derive novel scientific insights from large datasets. Another is the strong development of high performance computing (HPC) hardware and the accompanying development of software libraries and packages which can efficiently take advantage of the hardware.\n",
+    "\n",
+    "This module focuses on high-performance data analytics (HPDA), a subset of high-performance computing which focuses on working with large data. The data can come from either computer models and simulations or from experiments and observations, and the goal is to preprocess, analyse and visualise it to generate scientific results.\n",
+    "\n",
+    "The video shown below provide more descriptions of the big data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "eedea65f-dc03-48e8-b0b0-b13f1245e1da",
+   "metadata": {
+    "editable": true,
+    "slideshow": {
+     "slide_type": ""
+    },
+    "tags": [
+     "hide-input"
+    ]
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div align=\"center\">\n",
+       "<!-- The following is the snippet exported directly from YouTube, as is -->\n",
+       "    <iframe \n",
+       "        width=\"560\"\n",
+       "        height=\"315\"\n",
+       "        src=\"https://www.youtube.com/embed/qydP7cOH4qc\"\n",
+       "        title=\"YouTube video player\" \n",
+       "        frameborder=\"0\"\n",
+       "        allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\n",
+       "        referrerpolicy=\"strict-origin-when-cross-origin\" \n",
+       "        allowfullscreen>\n",
+       "    </iframe>\n",
+       "</div>\n"
+      ],
+      "text/plain": [
+       "<IPython.core.display.HTML object>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "%%HTML\n",
+    "<div align=\"center\">\n",
+    "<!-- The following is the snippet exported directly from YouTube, as is -->\n",
+    "    <iframe \n",
+    "        width=\"560\"\n",
+    "        height=\"315\"\n",
+    "        src=\"https://www.youtube.com/embed/qydP7cOH4qc\"\n",
+    "        title=\"YouTube video player\" \n",
+    "        frameborder=\"0\"\n",
+    "        allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\n",
+    "        referrerpolicy=\"strict-origin-when-cross-origin\" \n",
+    "        allowfullscreen>\n",
+    "    </iframe>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e2d13b58-428c-458d-adad-722b704ed670",
+   "metadata": {
+    "editable": true,
+    "slideshow": {
+     "slide_type": ""
+    },
+    "tags": []
+   },
+   "source": [
+    ":::{instructor-note}\n",
+    ":class: dropdown\n",
+    "Alternative method to embed videos\n",
+    "```py\n",
+    "from IPython.display import YouTubeVideo  \n",
+    "\n",
+    "YouTubeVideo('qydP7cOH4qc', width=560, height=315)\n",
+    "```\n",
+    "It is also possible to embed local videos using [IPython.display.Video](https://ipython.readthedocs.io/en/stable/api/generated/IPython.display.html#IPython.display.Video).\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5c3aca1b-0eb3-4331-98be-5016ee8a7346",
+   "metadata": {
+    "editable": true,
+    "slideshow": {
+     "slide_type": ""
+    },
+    "tags": []
+   },
+   "source": [
+    "## Python"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e87fabc2-8b49-41f7-bf2a-f8c5bfb5531d",
+   "metadata": {
+    "editable": true,
+    "slideshow": {
+     "slide_type": ""
+    },
+    "tags": []
+   },
+   "source": [
+    ":::{discussion}\n",
+    "\n",
+    "**Performance bottlenecks in Python**\n",
+    "- Have you ever written Python scripts that look something like the one below?\n",
+    "- Compared to C/C++/Fortran, this for-loop will probably be orders of magnitude slower\n",
+    "\n",
+    "```python\n",
+    "f = open(\"mydata.dat\", \"r\")\n",
+    "for line in f.readlines():\n",
+    "    fields = line.split(\",\")\n",
+    "    x, y, z = fields[1], fields[2], fields[3]\n",
+    "    # some analysis with x, y and z\n",
+    "f.close()\n",
+    "```\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0084f1d6-0e64-4a62-8c80-2d7129b7063f",
+   "metadata": {},
+   "source": [
+    "Despite early design choices of the Python language which made it significantly slower than conventional HPC languages, a rich and growing ecosystem of open source libraries have established Python as an industry-standard programming language for working with data on all levels of the data analytics pipeline. These range from generic numerical libraries to special-purpose and/or domain-specific packages. This module is focused on introducing modern packages from the Python ecosystem to work with large data. Specifically, we will learn to use:\n",
+    "- Numpy\n",
+    "- Scipy\n",
+    "- Pandas\n",
+    "- Xarray\n",
+    "- Numba\n",
+    "- Cython\n",
+    "- multithreading\n",
+    "- multiprocessing\n",
+    "- Dask"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fcceb8a9-dbb6-4150-b6fa-e594c75559c0",
+   "metadata": {},
+   "source": [
+    "## What You Will Learn"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "892400d4-4022-482b-915b-b1ef6f5c05c3",
+   "metadata": {},
+   "source": [
+    "This module provides a broad overview of methods to work with large datasets using tools and libraries from the Python ecosystem. Since this field is fairly extensive we will not have time to go into much depth. Instead, the objective is to expose just enough details on each topic for you to get a good idea of the big picture and an understanding of what combination of tools and libraries will work well for your particular use case.\n",
+    "\n",
+    "Specifically, **this module covers**:\n",
+    "- Tools for efficiently storing data and writing/reading data to/from disk\n",
+    "- How to share datasets and mint digital object identifiers (DOI)\n",
+    "- Main methods of efficiently working with tabular data and multidimensional arrays\n",
+    "- How to measure performance and boost performance of time consuming Python functions\n",
+    "- Various methods to parallelise Python code\n",
+    "\n",
+    "This module does not cover the following topics which may be of interest to the reader. Please refer to the links provided below to the other course materials.\n",
+    "- [Visualisation techniques](https://enccs.github.io/gpu-programming/)\n",
+    "- [Machine learning](https://enccs.github.io/gpu-programming/)\n",
+    "- [GPU programming](https://enccs.github.io/gpu-programming/)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "84f2e21f-61bb-43d3-af9d-ad3e02ea90ad",
+   "metadata": {},
+   "source": [
+    ":::{keypoints}\n",
+    "\n",
+    "- Datasets are getting larger across nearly all scientific and engineering domains\n",
+    "- The Python ecosystem has many libraries and packages for working with big data efficiently\n",
+    ":::"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

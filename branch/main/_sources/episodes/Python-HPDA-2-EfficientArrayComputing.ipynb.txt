@@ -1,0 +1,1033 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "3f4bbffd-9158-4439-a56b-e1387230898a",
+   "metadata": {},
+   "source": [
+    "# Efficient Array Computing"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d75d6ddf-8952-4ede-8ef6-d2007b13af84",
+   "metadata": {},
+   "source": [
+    "This episode introduces how to write high-performance numerical code in Python packages (Numpy, Pandas, and Scipy) by leveraging tools and libraries designed to optimize computation speed and memory usage. It explores strategies such as vectorization with NumPy, just-in-time compilation using Numba, and parallelization techniques that can significantly reduce execution time. These methods help Python developers overcome the traditional performance limitations of the language, making it suitable for intensive scientific and engineering applications.\n",
+    "\n",
+    "\n",
+    ":::{objectives}\n",
+    "- Understand limitations of Python’s standard library for large data processing\n",
+    "- Understand the logic behind NumPy ndarrays and learn to use some NumPy numerical computing tools\n",
+    "- Learn to use data structures and analysis tools from Panda\n",
+    "\n",
+    ":::\n",
+    "\n",
+    ":::{instructor-note}\n",
+    "- 25 min teaching/type-along\n",
+    "- 25 min exercising\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "77d1698a-d0d8-4f7d-82c7-295879509bac",
+   "metadata": {},
+   "source": [
+    "## Why can Python be slow?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "60f85dc7-f976-4f68-8a00-7a932a85e61b",
+   "metadata": {},
+   "source": [
+    "Computer programs are nowadays practically always written in a high-level human readable programming language and then translated to the actual machine instructions that a processor understands. There are two main approaches for this translation:\n",
+    "- For **compiled** programming languages, the translation is done by a compiler before the execution of the program\n",
+    "- For **interpreted** languages, the translation is done by an interpreter during the execution of the program"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "90608761-e934-475a-aad5-77cd7c02b635",
+   "metadata": {},
+   "source": [
+    "## NumPy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3255c658-7a01-44cb-af76-b5a1a439af44",
+   "metadata": {},
+   "source": [
+    "NumPy is based on well-optimized C code, which gives much better performace than regular Python. In particular, by using homogeneous data structures, NumPy *vectorizes* mathematical operations where fast pre-compiled code can be applied to a sequence of data instead of using traditional `for` loops."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "638075ee-14dd-4b45-9eec-1e8adda44ca3",
+   "metadata": {},
+   "source": [
+    "### Arrays"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0d1273f6-0885-4ce5-bd57-27d5ab1ed876",
+   "metadata": {},
+   "source": [
+    "The core of NumPy is the NumPy `ndarray` (n-dimensional array). Compared to a Python list, an ndarray is similar in terms of serving as a data container. Some differences between the two are:\n",
+    "- ndarrays can have multiple dimensions, *e.g.* a 1-D array is a vector, a 2-D array is a matrix\n",
+    "- ndarrays are fast only when all data elements are of the same type\n",
+    "\n",
+    "![](./images/python-list-vs-numpy-array.svg)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4ad93503-69e1-479a-9f0f-619776154c31",
+   "metadata": {},
+   "source": [
+    "### Creating NumPy arrays"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1082ddb2-3f15-4317-b7c9-462371886b31",
+   "metadata": {},
+   "source": [
+    "One way to create a NumPy array is to convert from a Python list, but make sure that the list is homogeneous (contains same data type) otherwise performace will be downgraded. Since appending elements to an existing array is slow, it is a common practice to preallocate the necessary space with `np.zeros` or `np.empty` when converting from a Python list is not possible."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "82c2b377-545e-4370-9cef-656d974acc06",
+   "metadata": {},
+   "source": [
+    ":::{demo} Code for demonstration\n",
+    "\n",
+    "```python\n",
+    "import numpy as np\n",
+    "\n",
+    "a = np.array((1, 2, 3, 4), float)\n",
+    "print(f\"a = {a}\\n\")\n",
+    "# array([ 1., 2., 3., 4.])\n",
+    "\n",
+    "list1 = [[1, 2, 3], [4, 5, 6]]\n",
+    "mat = np.array(list1, complex)\n",
+    "# create complex array, with imaginary part equal to zero\n",
+    "print(f\"mat = \\n {mat} \\n\")\n",
+    "# array([[ 1.+0.j, 2.+0.j, 3.+0.j],\n",
+    "#       [ 4.+0.j, 5.+0.j, 6.+0.j]])\n",
+    "\n",
+    "print(f\"mat.shape={mat.shape}, mat.size={mat.size}\")\n",
+    "# mat.shape=(2, 3), mat.size=6\n",
+    "```\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "28b339ff-ffc6-45e3-9268-ead4f028274e",
+   "metadata": {},
+   "source": [
+    ":::{caution}\n",
+    "\n",
+    "You should copy the code above to a separate code block, or change its cell type from from `Markdown` to `Code`.\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dc3debb2-b030-4146-98fb-3e2f0353f488",
+   "metadata": {},
+   "source": [
+    "`arange` and `linspace` can generate ranges of numbers:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "57d73af3-b0e4-41af-a9f2-d382c38f15d6",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[0 1 2 3 4 5 6 7 8 9]\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "\n",
+    "a = np.arange(10)\n",
+    "print(a)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "340fc8d9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[0.1  0.12 0.14 0.16 0.18]\n"
+     ]
+    }
+   ],
+   "source": [
+    "b = np.arange(0.1, 0.2, 0.02)\n",
+    "print(b)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "10c60004",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[-4.5  -2.25  0.    2.25  4.5 ]\n"
+     ]
+    }
+   ],
+   "source": [
+    "c = np.linspace(-4.5, 4.5, 5)\n",
+    "print(c)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "57f8e107-7284-4bec-a564-584ac8bebf0e",
+   "metadata": {},
+   "source": [
+    "### Array operations and manipulations"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2a4f3199-4ba9-489b-b1c0-f2dc648f1d5e",
+   "metadata": {},
+   "source": [
+    "All the familiar arithmetic operators in NumPy are applied elementwise:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "7c13292d-41c0-47f0-b466-53d522a2e5e2",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      " a + b = [5 7 9]\n",
+      " a / b = [0.25 0.4  0.5 ]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# 1D example\n",
+    "\n",
+    "import numpy as np\n",
+    "a = np.array([1, 2, 3])\n",
+    "b = np.array([4, 5, 6])\n",
+    "\n",
+    "print(f\" a + b = {a + b}\\n a / b = {a / b}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "059cf522-d280-4d5b-b231-13019a6bf3bb",
+   "metadata": {},
+   "source": [
+    "![](./images/np_add_1d_new.svg)\n",
+    "\n",
+    "![](./images/np_div_1d_new.svg)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "24fee750-a4f6-4fc9-b7d7-ed902135dce9",
+   "metadata": {},
+   "source": [
+    "::::{exercise}\n",
+    "\n",
+    "Run the code below to get familiar with indexing in a 2D example.\n",
+    "    \n",
+    "```python\n",
+    "# 2D example\n",
+    "\n",
+    "import numpy as np\n",
+    "a = np.array([[1, 2, 3], [4, 5, 6]])\n",
+    "b = np.array([[10, 10, 10], [10, 10, 10]])\n",
+    "\n",
+    "print(a+b)\n",
+    "\n",
+    "```\n",
+    "\n",
+    ":::{note}\n",
+    "\n",
+    "You can either copy the code from the cell above or download the code example from [HERE](./code/code-example.py).\n",
+    "\n",
+    ":::\n",
+    "\n",
+    "\n",
+    ":::{solution}\n",
+    "\n",
+    "```python\n",
+    "import numpy as np\n",
+    "a = np.array([[1, 2, 3], [4, 5, 6]])\n",
+    "b = np.array([[10, 10, 10], [10, 10, 10]])\n",
+    "\n",
+    "print(a+b)\n",
+    "```\n",
+    "\n",
+    "```\n",
+    "[[11 12 13]\n",
+    " [14 15 16]]\n",
+    "\n",
+    "```\n",
+    "\n",
+    "![](./images/np_add_2d.svg)\n",
+    "\n",
+    ":::\n",
+    "\n",
+    "::::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c98b90a3-40b6-44af-a093-4d06448602ba",
+   "metadata": {},
+   "source": [
+    "### Array indexing"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b6169cc3-d7ee-4d67-bde2-b7b133b18b12",
+   "metadata": {},
+   "source": [
+    "Basic indexing is similar to Python lists. Note that advanced indexing creates copies of arrays."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "ee6baded-2b25-4fb3-a3f7-831e8fa47132",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Integer indexing\n",
+      "data = [1 2 3 4 5 6 7 8]\n",
+      "data[3] = 4\n",
+      "data[0:2] = [1 2]\n",
+      "data[-2] = 7\n",
+      "data[::-4] = [8 4]\n",
+      "\n",
+      "Fancy indexing\n",
+      "data[[1,6,3]] = [2 7 4]\n",
+      "\n",
+      "Boolean indexing\n",
+      "data[data>5] = [6 7 8]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# 1D example\n",
+    "\n",
+    "import numpy as np\n",
+    "\n",
+    "data = np.array([1,2,3,4,5,6,7,8])\n",
+    "\n",
+    "# integer indexing\n",
+    "print(\"Integer indexing\")\n",
+    "print(f\"data = {data}\")\n",
+    "print(f\"data[3] = {data[3]}\")\n",
+    "print(f\"data[0:2] = {data[0:2]}\")\n",
+    "print(f\"data[-2] = {data[-2]}\")\n",
+    "print(f\"data[::-4] = {data[::-4]}\")\n",
+    "\n",
+    "# fancy indexing\n",
+    "print(\"\\nFancy indexing\")\n",
+    "print(f\"data[[1,6,3]] = {data[[1,6,3]]}\")\n",
+    "\n",
+    "# boolean indexing\n",
+    "print(\"\\nBoolean indexing\")\n",
+    "print(f\"data[data>5] = {data[data>5]}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9ab8c685-4150-445d-8fa4-1aca454a2f51",
+   "metadata": {},
+   "source": [
+    "![](./images/array-indexing-1D.png){w=30em align=center}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "38631dd2-6ad3-46c5-ae6d-4eafbc40ecc1",
+   "metadata": {},
+   "source": [
+    ":::{exercise}\n",
+    "\n",
+    "Run the code below to get familiar with indexing in a 2D example.\n",
+    "\n",
+    "```python\n",
+    "# 2D example\n",
+    "\n",
+    "data = np.array([[1, 2, 3, 4],[5, 6, 7, 8],[9, 10, 11, 12]])\n",
+    "\n",
+    "# integer indexing\n",
+    "print(\"Integer indexing\")\n",
+    "print(f\"data[1] = {data[1]}\")\n",
+    "print(f\"data[:, 1] = {data[:, 1]}\")\n",
+    "print(f\"data[1:3, 2:4] = {data[1:3, 2:4]}\")\n",
+    "\n",
+    "# fancy indexing\n",
+    "print(\"\\nFancy indexing\")\n",
+    "print(f\"data[[0,2,1], [2,3,0]] = {data[[0,2,1], [2,3,0]]}\")\n",
+    "\n",
+    "# boolean indexing\n",
+    "print(\"\\nBoolean indexing\")\n",
+    "print(f\"data[data>10] = {data[data>10]}\")\n",
+    "```\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1aa195fd-25d8-4206-8926-155e1eaccee4",
+   "metadata": {},
+   "source": [
+    ":::{caution}\n",
+    "\n",
+    "Again, you should move the code above to a separate code block, or change its cell type from from `Markdown` to `Code`.\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a2ff3cf3-e3af-4b17-b6f4-ea4f673ee6fe",
+   "metadata": {},
+   "source": [
+    "### I/O with NumPy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "aa4f1d0d-ee28-4fe7-a83f-d1a861b4420b",
+   "metadata": {},
+   "source": [
+    "Numpy provides functions for reading from/writing to files. Both ASCII and binary formats are supported with the CSV and npy/npz formats."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cfa22e44-bd96-40fe-bc51-6587d2a596e7",
+   "metadata": {},
+   "source": [
+    "**CSV**\n",
+    "\n",
+    "The `numpy.loadtxt()` and `numpy.savetxt()` functions can be used. They save in a regular column layout and can deal with different delimiters, column titles and numerical representations."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "e09e8057-7dc0-4b6d-9cd9-2a478ea7ba62",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[ True  True  True  True]\n"
+     ]
+    }
+   ],
+   "source": [
+    "a = np.array([1, 2, 3, 4])\n",
+    "np.savetxt(\"my_array.csv\", a)\n",
+    "b = np.loadtxt(\"my_array.csv\")\n",
+    "\n",
+    "print(a == b)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "111e5e3b-b141-4a73-8b3a-ebe1a29b8d45",
+   "metadata": {},
+   "source": [
+    ":::{attention}\n",
+    "\n",
+    "If you get an eror like xxx, you should import numpy before the first line `import numpy as np`.\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0d2250c8-8722-4376-907a-46dc1e1e6758",
+   "metadata": {},
+   "source": [
+    "**Binary**\n",
+    "\n",
+    "The npy format is a binary format used to dump arrays of any shape. Several arrays can be saved into a single npz file, which is simply a zipped collection of different npy files. All the arrays to be saved into a npz file can be passed as kwargs to the `numpy.savez()` function. The data can then be recovered using the `numpy.load()` method, which returns a dictionary-like object in which each key points to one of the arrays."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "69eab475-5073-4a2e-a2bf-4f2419ed4b1f",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[ True  True  True  True]\n"
+     ]
+    }
+   ],
+   "source": [
+    "a = np.array([1, 2, 3, 4])\n",
+    "b = np.array([5, 6, 7, 8])\n",
+    "\n",
+    "np.savez(\"my_arrays.npz\", array_1=a, array_2=b)\n",
+    "data = np.load(\"my_arrays.npz\")\n",
+    "\n",
+    "print(data['array_1'] == a) # [ True  True  True  True]\n",
+    "print(data['array_2'] == b) # [ True  True  True  True]\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b91fe11d-1413-4a87-8844-d026a17d17d6",
+   "metadata": {},
+   "source": [
+    "### Random numbers"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1a30fd65-7014-47aa-97eb-0dd1f759e275",
+   "metadata": {},
+   "source": [
+    "The module `numpy.random` provides several functions for constructing random arrays\n",
+    "- `random()`: uniform random numbers\n",
+    "- `normal()`: normal distribution\n",
+    "- `choice()`: random sample from given array\n",
+    "- …"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "f80e6817-410f-4322-ba59-f509077c32ed",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[0.22119482 0.40071875]\n",
+      " [0.13960031 0.44234418]] \n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(np.random.random((2,2)),'\\n')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "35f16c4d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[3 1 1 0 2 2 1 0 3 2]\n"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "print(np.random.choice(np.arange(4), 10))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5e53054d-11d6-45d2-b167-5fd363dea33f",
+   "metadata": {},
+   "source": [
+    ":::{warning}\n",
+    "\n",
+    "You might get different results from the above code example.\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f7e60549-1099-49bb-a72e-694d0146c0ad",
+   "metadata": {},
+   "source": [
+    "## Pandas"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4e44aed7-4b4a-4249-b2c7-5d31d444ed08",
+   "metadata": {},
+   "source": [
+    "Pandas is a Python package that provides high-performance and easy to use data structures and data analysis tools. The core data structures of Pandas are Series and Dataframes.\n",
+    "- a Pandas `series` is a one-dimensional NumPy array with an index which we could use to access the data\n",
+    "- a `dataframe` consist of a table of values with labels for each row and column. A dataframe can combine multiple data types, such as numbers and text, but the data in each column is of the same type.\n",
+    "- each column of a dataframe is a series object - a dataframe is thus a collection of series.\n",
+    "\n",
+    "![](./images/pandas_dataframe.svg){w=30em align=center}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5767a756-8118-40ce-bff3-0aeefc460912",
+   "metadata": {},
+   "source": [
+    "### Data analysis workflow"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f21cf1c1-8557-4b00-8d82-5f5c88928907",
+   "metadata": {},
+   "source": [
+    "Pandas is a powerful tool for many steps of a data analysis pipeline:\n",
+    "\n",
+    "To explore some of the capabilities, we start with an example dataset containing the passenger list from the Titanic, which is often used in Kaggle competitions and data science tutorials. First step is to load Pandas and download the dataset into a dataframe."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "30d55613-ebc2-4ca7-b2a4-b28caf32c36c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "url = \"https://raw.githubusercontent.com/pandas-dev/pandas/master/doc/data/titanic.csv\"\n",
+    "\n",
+    "# set the index to the \"Name\" column\n",
+    "titanic = pd.read_csv(url, index_col=\"Name\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a74b8720-f731-4de1-8c7b-06745da45458",
+   "metadata": {},
+   "source": [
+    ":::{note}\n",
+    "\n",
+    "Pandas also understands multiple other formats, for example `read_excel()`, `read_hdf()`, `read_json()`, *etc.* (and corresponding methods to write to file: `to_csv()`, `to_excel()`, `to_hdf()`, `to_json()`, …)…)\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "41bf3e24-e7ed-4dd5-81fc-cf63cb3553e9",
+   "metadata": {},
+   "source": [
+    "We can now view the dataframe to get an idea of what it contains and print some summary statistics of its numerical data:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7c72aa03-6ec8-4bcb-bdcf-efbe8b6077f8",
+   "metadata": {},
+   "source": [
+    "```python\n",
+    "# print the first 5 lines of the dataframe\n",
+    "print(titanic.head())\n",
+    "\n",
+    "# print some information about the columns\n",
+    "print(titanic.info())\n",
+    "\n",
+    "# print summary statistics for each column\n",
+    "print(titanic.describe())\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "836d0885-74f2-4199-bf29-e14d8aed9233",
+   "metadata": {},
+   "source": [
+    "### Missing/invalid data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "87ef2401-993d-4b77-8856-3260ad2cf8e8",
+   "metadata": {},
+   "source": [
+    "What if your dataset has missing data? Pandas uses the value np.nan to represent missing data, and by default does not include it in any computations. We can find missing values, drop them from our dataframe, replace them with any value we like or do forward or backward filling."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6e6dbd71-88b0-4a01-b74e-3b3122bdc4d9",
+   "metadata": {},
+   "source": [
+    "```python\n",
+    "titanic.isna()                           # returns boolean mask of NaN values\n",
+    "\n",
+    "print(titanic.dropna())                  # drop missing values\n",
+    "print(titanic.dropna(how=\"any\"))         # or how=\"all\"\n",
+    "print(titanic.dropna(subset=[\"Cabin\"]))  # only drop NaNs from one column\n",
+    "print(titanic.fillna(0))                 # replace NaNs with zero\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e8481f91-7243-4949-85f1-e4a38e7760d3",
+   "metadata": {},
+   "source": [
+    "## Scipy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0c8dba01-b9ef-4422-8c7f-896867ed7e3a",
+   "metadata": {},
+   "source": [
+    "SciPy is a library that builds on top of NumPy. It contains a lot of interfaces to battle-tested numerical routines written in Fortran or C, as well as Python implementations of many common algorithms."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a3ada338-1a80-47bc-8784-c62bcb80d4e6",
+   "metadata": {},
+   "source": [
+    "Let us look more closely into one out of the countless useful functions available in SciPy. `curve_fit()` is a non-linear least squares fitting function. NumPy has least-squares fitting via the `np.linalg.lstsq()` function, but we need to go to SciPy to find non-linear curve fitting. This example fits a power-law to a vector."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "e84c4e31-9fb6-416c-9182-c62fa02e1b7a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "A = 10240.788123784849 +/- 984.5879720590807\n",
+      "s = -0.5372630409593478 +/- 0.08171727565402351\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "from scipy.optimize import curve_fit\n",
+    "\n",
+    "def powerlaw(x, A, s):\n",
+    "    return A * np.power(x, s)\n",
+    "\n",
+    "# data\n",
+    "Y = np.array([9115, 8368, 7711, 5480, 3492, 3376, 2884, 2792, 2703, 2701])\n",
+    "X = np.arange(Y.shape[0]) + 1.0\n",
+    "\n",
+    "# initial guess for variables\n",
+    "p0 = [100, -1]\n",
+    "# fit data\n",
+    "params, cov = curve_fit(f=powerlaw, xdata=X, ydata=Y, p0=p0, bounds=(-np.inf, np.inf))\n",
+    "\n",
+    "print(\"A =\", params[0], \"+/-\", cov[0,0]**0.5)\n",
+    "print(\"s =\", params[1], \"+/-\", cov[1,1]**0.5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "abbfecc9-d5bb-40d4-9d16-36bdfd06ca22",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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",
+      "text/plain": [
+       "<Figure size 640x480 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# optionally plot\n",
+    "import matplotlib.pyplot as plt\n",
+    "plt.scatter(X,Y, label=\"raw data\")\n",
+    "plt.plot(X, powerlaw(X, params[0], params[1]), label=\"power law\")\n",
+    "plt.legend()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d7c74b20-0ace-49b8-ab7c-0bc2fe5b6310",
+   "metadata": {},
+   "source": [
+    "## Exercises"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9be7da04-5b63-4f5b-a37d-d74c3507cf08",
+   "metadata": {},
+   "source": [
+    ":::{exercise} Working effectively with dataframes\n",
+    "\n",
+    "Recall the `curve_fit()` method from SciPy discussed above, and imagine that we want to fit powerlaws to every row in a large dataframe. How can this be done effectively?\n",
+    "\n",
+    "First define the `powerlaw()` function and another function for fitting a row of numbers:\n",
+    "```python\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "from scipy.optimize import curve_fit\n",
+    "\n",
+    "def powerlaw(x, A, s):\n",
+    "    return A * np.power(x, s)\n",
+    "\n",
+    "def fit_powerlaw(row):\n",
+    "    X = np.arange(row.shape[0]) + 1.0\n",
+    "    params, cov = curve_fit(f=powerlaw, xdata=X, ydata=row, p0=[100, -1], bounds=(-np.inf, np.inf))\n",
+    "    return params[1]\n",
+    "```\n",
+    "\n",
+    "Next load a dataset with multiple rows similar to the one used in the example above:\n",
+    "```python\n",
+    "df = pd.read_csv(\"https://raw.githubusercontent.com/ENCCS/hpda-python/main/content/data/results.csv\")\n",
+    "# print first few rows\n",
+    "df.head()\n",
+    "```\n",
+    "\n",
+    "Now consider these four different ways of fitting a powerlaw to each row of the dataframe:\n",
+    "```python\n",
+    "# 1. Loop\n",
+    "\n",
+    "powers = []\n",
+    "for row_indx in range(df.shape[0]):\n",
+    "    row = df.iloc[row_indx,1:]\n",
+    "    p = fit_powerlaw(row)\n",
+    "    powers.append(p)\n",
+    "```\n",
+    "\n",
+    "```python\n",
+    "# 2. `iterrows()\n",
+    "\n",
+    "powers = []\n",
+    "for row_indx,row in df.iterrows():\n",
+    "    p = fit_powerlaw(row[1:])\n",
+    "    powers.append(p)\n",
+    "```\n",
+    "\n",
+    "```python\n",
+    "# 3. `apply()\n",
+    "\n",
+    "powers = df.iloc[:,1:].apply(fit_powerlaw, axis=1)\n",
+    "```\n",
+    "\n",
+    "```python\n",
+    "# 4. `apply()` with `raw=True`\n",
+    "\n",
+    "# raw=True passes numpy ndarrays instead of series to fit_powerlaw\n",
+    "powers = df.iloc[:,1:].apply(fit_powerlaw, axis=1, raw=True)\n",
+    "```\n",
+    "\n",
+    "Which one do you think is most efficient? You can measure the execution time by adding `%%timeit` to the first line of a Jupyter code cell. More on timing and profiling in a later episode.\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4dcc8384-0056-4f4e-8963-641a8783d009",
+   "metadata": {},
+   "source": [
+    ":::{solution} Working effectively with dataframes\n",
+    "\n",
+    "The execution time for four different methods are described below. Note that you may get different numbers when you run these examples.\n",
+    "\n",
+    "```python\n",
+    "# 1 Loop\n",
+    "\n",
+    "%%timeit\n",
+    "powers = []\n",
+    "for row_indx in range(df.shape[0]):\n",
+    "   row = df.iloc[row_indx,1:]\n",
+    "   p = fit_powerlaw(row)\n",
+    "   powers.append(p)\n",
+    "\n",
+    "# 33.6 ms ± 682 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)\n",
+    "```\n",
+    "\n",
+    "```python\n",
+    "# 2. `iterrows()`\n",
+    "\n",
+    "%%timeit\n",
+    "powers = []\n",
+    "for row_indx,row in df.iterrows():\n",
+    "   p = fit_powerlaw(row[1:])\n",
+    "   powers.append(p)\n",
+    "\n",
+    "# 28.7 ms ± 947 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)\n",
+    "```\n",
+    "\n",
+    "```python\n",
+    "# 3. `apply()`\n",
+    "\n",
+    "%%timeit\n",
+    "powers = df.iloc[:,1:].apply(fit_powerlaw, axis=1)\n",
+    "\n",
+    "# 26.1 ms ± 1.19 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)\n",
+    "```\n",
+    "\n",
+    "```python\n",
+    "# 4. `apply()` with `raw=True`\n",
+    "\n",
+    "%%timeit\n",
+    "powers = df.iloc[:,1:].apply(fit_powerlaw, axis=1, raw=True)\n",
+    "\n",
+    "# 24 ms ± 1.27 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)\n",
+    "```\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d2a6f18b-72e1-4305-8dea-8fcc90c72d5b",
+   "metadata": {},
+   "source": [
+    ":::{exercise} Further analysis of Titanic passenger list dataset\n",
+    "\n",
+    "Consider the titanic dataset.\n",
+    "> If you haven’t done so already, load it into a dataframe before the exercises:\n",
+    "> \n",
+    "> `import pandas as pd; url = \"https://raw.githubusercontent.com/pandas-dev/pandas/master/doc/data/titanic.csv\"; titanic = pd.read_csv(url, index_col=\"Name\")`\n",
+    "- Compute the mean age of the first 10 passengers by slicing and the `mean` method\n",
+    "- Using boolean indexing, compute the survival rate (mean of “Survived” values) among passengers over and under the average age.\n",
+    "Now investigate the family size of the passengers (*i.e.* the “SibSp” column):\n",
+    "- What different family sizes exist in the passenger list?\n",
+    "    - **Hint**: try the `unique()` method\n",
+    "- What are the names of the people in the largest family group?\n",
+    "- (Advanced) Create histograms showing the distribution of family sizes for passengers split by the fare, i.e. one group of high-fare passengers (where the fare is above average) and one for low-fare passengers\n",
+    "    - **Hint**: instead of an existing column name, you can give a lambda function as a parameter to `hist` to compute a value on the fly. For example `lambda x: \"Poor\" if titanic[\"Fare\"].loc[x] < titanic[\"Fare\"].mean() else \"Rich\"`).\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7eaaf004-3273-4ffb-89a4-8bb824e9e819",
+   "metadata": {},
+   "source": [
+    ":::{solution}\n",
+    "\n",
+    "1. Mean age of the first 10 passengers: \n",
+    "\t- `titanic.iloc[:10,:][\"Age\"].mean()` or \n",
+    "\t- `titanic.iloc[:10,4].mean()` or \n",
+    "\t- `titanic.loc[:\"Nasser, Mrs. Nicholas (Adele Achem)\", \"Age\"].mean()`\n",
+    "\n",
+    "2. Survival rate among passengers over and under average age:\n",
+    "\t- `titanic[titanic[\"Age\"] > titanic[\"Age\"].mean()][\"Survived\"].mean()` and \n",
+    "\t- `titanic[titanic[\"Age\"] < titanic[\"Age\"].mean()][\"Survived\"].mean()`\n",
+    "\n",
+    "3. Existing family sizes: `titanic[\"SibSp\"].unique()`\n",
+    "\n",
+    "4. Names of members of largest family(ies): `titanic[titanic[\"SibSp\"] == 8].index`\n",
+    "\n",
+    "5. `titanic.hist(\"SibSp\", lambda x: \"Poor\" if titanic[\"Fare\"].loc[x] < titanic[\"Fare\"].mean() else \"Rich\", rwidth=0.9)`\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "67623afb-3429-4cb3-afa3-21d28ad3d8a2",
+   "metadata": {},
+   "source": [
+    ":::{keypoints}\n",
+    "\n",
+    "- NumPy provides a static array data structure, fast mathematical operations for arrays and tools for linear algebra and random numbers\n",
+    "- Pandas dataframes are a good data structure for tabular data\n",
+    "- Dataframes allow both simple and advanced analysis in very compact form\n",
+    "- SciPy contains a lot of interfaces to battle-tested numerical routines\n",
+    "\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5366841b-fda2-4658-876b-03cd34a67c8b",
+   "metadata": {},
+   "source": [
+    ":::{seealso}\n",
+    "\n",
+    "- [Introduction to running R, Python, Julia, and Matlab in HPC](https://uppmax.github.io/R-python-julia-matlab-HPC/)\n",
+    "- [Practical Intro to GPU Programming using Python](https://github.com/ENCCS/webinar_documents/tree/main/2024-oct-24-python)\n",
+    "- [Using Python in an HPC environment](https://uppmax.github.io/HPC-python/)\n",
+    "- [Python for Scientific Computing](https://aaltoscicomp.github.io/python-for-scicomp/)\n",
+    "- ...\n",
+    "\n",
+    ":::"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
