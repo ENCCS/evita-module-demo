@@ -14,8 +14,9 @@ stages:
 
 variables:
   DEFAULT_BRANCH: "main"
+  MAIN_BUILD_FORMAT: "html"  # or "dirhtml"
   GENERATE_PDF: "false"
-  GENERATE_SINGLEHTML: "true"
+  GENERATE_SINGLEHTML: "false"
   PDF_FILENAME: "lesson.pdf"
   MULTIBRANCH: "true"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -27,11 +28,24 @@ cache:
   paths:
     - .cache/pip
 
+# Run nox (tests/linters)
+tests:
+  stage: build
+  tags:
+    - evita
+  script:
+    - pip install nox
+    - FORCE_COLOR=1 nox
+  allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
 # Build documentation in all formats
 build-docs:
   stage: build
   tags:
-    - eosc
+    - evita
   script:
     # Install dependencies
     - python -m pip install --upgrade pip
@@ -48,15 +62,15 @@ build-docs:
     - pip list --not-required
     - pip list
 
-    # Build dirhtml (main format)
-    - make dirhtml
+    # Build (main format)
+    - make ${MAIN_BUILD_FORMAT}
 
     # Build singlehtml if enabled
     - |
       if [ "$GENERATE_SINGLEHTML" = "true" ]; then
         echo "Generating singlehtml..."
         make singlehtml
-        mv _build/singlehtml/ _build/dirhtml/singlehtml/
+        mv _build/singlehtml/ _build/${MAIN_BUILD_FORMAT}/singlehtml/
       fi
 
     # Build PDF if enabled
@@ -70,15 +84,12 @@ build-docs:
         # Configure pyppeteer to run in Docker (no sandbox)
         export PYPPETEER_CHROMIUM_ARGS="--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage"
         make pyppeteer
-        mv _build/pyppeteer/*.pdf _build/dirhtml/${PDF_FILENAME}
+        mv _build/pyppeteer/*.pdf _build/${MAIN_BUILD_FORMAT}/${PDF_FILENAME}
       fi
-
-    # Add .nojekyll file
-    - touch _build/dirhtml/.nojekyll
 
   artifacts:
     paths:
-      - _build/dirhtml/
+      - _build/${MAIN_BUILD_FORMAT}/
     expire_in: 1 week
 
   rules:
@@ -91,7 +102,7 @@ pages:
   stage: deploy
   pages: true  # specifies that this is a Pages job and publishes the default public directory
   tags:
-    - eosc
+    - evita
   dependencies:
     - build-docs
   script:
@@ -101,11 +112,11 @@ pages:
       if [ "$CI_COMMIT_REF_NAME" = "$DEFAULT_BRANCH" ]; then
         echo "Deploying main branch to root..."
         mkdir -p public
-        cp -r _build/dirhtml/* public/
+        cp -r _build/${MAIN_BUILD_FORMAT}/* public/
       else
         echo "Deploying branch ${CI_COMMIT_REF_NAME} to /branch/${CI_COMMIT_REF_SLUG}/..."
         mkdir -p public/branch/$CI_COMMIT_REF_SLUG
-        cp -r _build/dirhtml/* public/branch/$CI_COMMIT_REF_SLUG/
+        cp -r _build/${MAIN_BUILD_FORMAT}/* public/branch/$CI_COMMIT_REF_SLUG/
       fi
 
   artifacts:

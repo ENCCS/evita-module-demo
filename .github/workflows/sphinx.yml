@@ -8,20 +8,41 @@
 
 
 name: sphinx
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 env:
   DEFAULT_BRANCH: "main"
+  MAIN_BUILD_FORMAT: "html"  # or "dirhtml"
   # If these SPHINXOPTS are enabled, then be strict about the
   # builds and fail on any warnings.
   #SPHINXOPTS: "-W --keep-going -T"
-  GENERATE_PDF: false          # to enable, must be 'true' lowercase
-  GENERATE_SINGLEHTML: true   # to enable, must be 'true' lowercase
+  GENERATE_PDF: false         # to enable, must be 'true' lowercase
+  GENERATE_SINGLEHTML: false  # to enable, must be 'true' lowercase
   PDF_FILENAME: lesson.pdf
   MULTIBRANCH: true    # to enable, must be 'true' lowercase
 
 
 jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+          persist-credentials: false
+
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Run nox
+        run: |
+          pip install nox
+          FORCE_COLOR=1 nox
+
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -30,7 +51,7 @@ jobs:
 
     steps:
       # https://github.com/marketplace/actions/checkout
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -76,18 +97,18 @@ jobs:
 
 
       # Build
-      - uses: ammaraskar/sphinx-problem-matcher@master
-      - name: Build Sphinx docs (dirhtml)
+      - uses: sphinx-doc/github-problem-matcher@1f74d6599f4a5e89a20d3c99aab4e6a70f7bda0f
+      - name: Build Sphinx docs (${{ env.MAIN_BUILD_FORMAT }})
         # SPHINXOPTS used via environment variables
         run: |
-          make dirhtml
+          make ${{ env.MAIN_BUILD_FORMAT }}
 
       # singlehtml
       - name: Generate singlehtml
         if: ${{ env.GENERATE_SINGLEHTML == 'true' }}
         run: |
           make singlehtml
-          mv _build/singlehtml/ _build/dirhtml/singlehtml/
+          mv _build/singlehtml/ _build/${{ env.MAIN_BUILD_FORMAT }}/singlehtml/
 
       # PDF if requested
       - name: Generate PDF
@@ -95,21 +116,21 @@ jobs:
         run: |
           pip install sphinx_pyppeteer_builder
           make pyppeteer
-          mv _build/pyppeteer/*.pdf _build/dirhtml/${PDF_FILENAME}
+          mv _build/pyppeteer/*.pdf _build/${{ env.MAIN_BUILD_FORMAT }}/${{ env.PDF_FILENAME }}
 
       # Stage all deployed assets in _gh-pages/ for simplicity, and to
       # prepare to do a multi-branch deployment.
       - name: Copy deployment data to _gh-pages/
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         run:
-          rsync -a _build/dirhtml/ _gh-pages/
+          rsync -a _build/${{ env.MAIN_BUILD_FORMAT }}/ _gh-pages/
 
       # Use gh-pages-multibranch to multiplex different branches into
       # one deployment. See
       # https://github.com/coderefinery/gh-pages-multibranch
       - name: gh-pages multibranch
-        uses: coderefinery/gh-pages-multibranch@main
-        if: ${{ github.event_name == 'push' && env.MULTIBRANCH == 'true' }}
+        uses: coderefinery/gh-pages-multibranch@62c62374e257fd106d44394788a806473f53b86b
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.MULTIBRANCH == 'true' }}
         with:
           directory: _gh-pages/
           default_branch: ${{ env.DEFAULT_BRANCH }}
@@ -117,13 +138,13 @@ jobs:
 
       # Add the .nojekyll file
       - name: nojekyll
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         run: |
           touch _gh-pages/.nojekyll
 
       # Save artifact for the next step.
-      - uses: actions/upload-artifact@v4
-        if: ${{ github.event_name == 'push' }}
+      - uses: actions/upload-artifact@v6
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         with:
           name: gh-pages-build
           path: _gh-pages/
@@ -135,13 +156,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     # This if can't use the env context - find better way later.
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
 
     steps:
-      - uses: actions/download-artifact@v4
-        if: ${{ github.event_name == 'push' && ( env.MULTIBRANCH == 'true' || github.ref == format('refs/heads/{0}', env.DEFAULT_BRANCH )) }}
+      - uses: actions/download-artifact@v7
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && ( env.MULTIBRANCH == 'true' || github.ref == format('refs/heads/{0}', env.DEFAULT_BRANCH )) }}
         with:
           name: gh-pages-build
           path: _gh-pages/
@@ -154,8 +175,8 @@ jobs:
       # Deploy
       # https://github.com/peaceiris/actions-gh-pages
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' && ( env.MULTIBRANCH == 'true' || github.ref == format('refs/heads/{0}', env.DEFAULT_BRANCH )) }}
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && ( env.MULTIBRANCH == 'true' || github.ref == format('refs/heads/{0}', env.DEFAULT_BRANCH )) }}
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
