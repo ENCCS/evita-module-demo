@@ -13,9 +13,7 @@
 
 # -- Project information -----------------------------------------------------
 
-# FIXME: choose title
 project = "High Performance Data Analytics in Python"
-# FIXME: insert correct author
 author = "\
 Ashwin Vishnu Mohanan, \
 Claudia Blaas-Schenner, \
@@ -31,7 +29,6 @@ Yinyin Ma, and \
 Yonglei Wang"
 copyright = f"2026, EVITA project, {author}"
 
-# FIXME: git organization / user that the repository belongs to
 git_forge = "code.europa.eu"  # or "github.com"
 git_user = "eurohpc-ju/evita"
 git_repo_name = "module-demo"  # auto-detected from dirname if blank
@@ -56,7 +53,6 @@ if git_forge == "github.com":
     # githubpages just adds a .nojekyll file
     extensions.append("sphinx.ext.githubpages")
 
-# FIXME: add bibtex files for references if any
 bibtex_bibfiles = []
 
 # Settings for myst_nb:
@@ -137,8 +133,6 @@ html_context = {
     "git_version": git_version,
     "conf_py_path": conf_py_path,
 }
-
-# FIXME: modify intersphinx mapping to link to external content
 
 # Intersphinx mapping.  For example, with this you can use
 # :py:mod:`multiprocessing` to link straight to the Python docs of that module.
